@@ -751,9 +751,10 @@
                     else if (line.includes("パパ") || line.includes("夫")) target = "🦍 夫(パパ) (緑)";
                     else if (line.includes("ママ") || line.includes("りおん") || line.includes("私")) target = "👩 私(ママ・りおん) (オレンジ)";
 
+                    const dayNum = (10 + idx).toString().padStart(2, '0');
                     return {
-                        date: `7月${10 + idx}日`,
-                        time: "10:00〜",
+                        date: `2026-07-${dayNum}`,
+                        time: "10:00",
                         title: line,
                         target: target,
                         belongings: "水筒・コップ・お箸セット（毎日洗浄・記名）",
@@ -762,11 +763,11 @@
                 });
             } else {
                 events = [
-                    { date: "7月2日(木)", time: "10:00〜11:30", title: "プラネタリウム見学（年長）", target: "🦄 長女 (ピンク)", belongings: "水筒、コップ、お箸セット、記名済みしおり", statusText: "🆕 新規追加" },
-                    { date: "7月3日(金)", time: "10:15〜", title: "全園児 避難訓練", target: "👶👶 子供たち（二人とも・赤）", belongings: "防災頭巾チェック、上履き", statusText: "🔄 既存予定へ時間・持ち物を追記編集✨" },
-                    { date: "7月8日(水)", time: "10:30〜11:15", title: "ECC英語教室（年長）", target: "🦄 長女 (ピンク)", belongings: "英語教材ノート、筆記用具", statusText: "🆕 新規追加" },
-                    { date: "7月13日(月)", time: "14:00〜", title: "たいよう組 個人面談", target: "🦁 息子 (水色)", belongings: "質問・相談シート、室内スリッパ持参", statusText: "🔄 既存面談枠へ持ち物・時間を追記編集✨" },
-                    { date: "8月12日(水)", time: "終日", title: "全園児お弁当持参日（お盆協力期間）", target: "👶👶 子供たち（二人とも・赤）", belongings: "🍱 お弁当・水筒・コップ・お箸セット（記名必須）", statusText: "🔄 既存スケジュールへお弁当メモを追記✨" }
+                    { date: "2026-07-02", time: "10:00", title: "プラネタリウム見学（年長）", target: "🦄 長女 (ピンク)", belongings: "水筒、コップ、お箸セット、記名済みしおり", statusText: "🆕 新規追加" },
+                    { date: "2026-07-03", time: "10:15", title: "全園児 避難訓練", target: "👶👶 子供たち（二人とも・赤）", belongings: "防災頭巾チェック、上履き", statusText: "🔄 既存予定へ時間・持ち物を追記編集✨" },
+                    { date: "2026-07-08", time: "10:30", title: "ECC英語教室（年長）", target: "🦄 長女 (ピンク)", belongings: "英語教材ノート、筆記用具", statusText: "🆕 新規追加" },
+                    { date: "2026-07-13", time: "14:00", title: "たいよう組 個人面談", target: "🦁 息子 (水色)", belongings: "質問・相談シート、室内スリッパ持参", statusText: "🔄 既存面談枠へ持ち物・時間を追記編集✨" },
+                    { date: "2026-08-12", time: "09:00", title: "全園児お弁当持参日（お盆協力期間）", target: "👶👶 子供たち（二人とも・赤）", belongings: "🍱 お弁当・水筒・コップ・お箸セット（記名必須）", statusText: "🔄 既存スケジュールへお弁当メモを追記✨" }
                 ];
             }
 
@@ -777,11 +778,11 @@
                 const stText = ev.statusText || "🆕 新規追加";
                 const isUpdate = stText.includes("🔄");
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
                         <label style="display:flex; align-items:center; gap:6px; font-weight:800; color:#D9385E; cursor:pointer; font-size:0.83rem;">
                             <input type="checkbox" class="ev-check" checked style="width:18px; height:18px; accent-color:#FF4D6D;">
-                            <span>📅 <input type="text" class="ev-date" value="${ev.date}" style="border:1px solid #FFCCD5; border-radius:6px; padding:2px 5px; font-weight:700; width:90px; color:#2D1E22;"></span>
-                            <span>⏰ <input type="text" class="ev-time" value="${ev.time}" style="border:1px solid #FFCCD5; border-radius:6px; padding:2px 5px; font-weight:700; width:80px; color:#2D1E22;"></span>
+                            <span>📅 <input type="date" class="ev-date" value="${ev.date}" style="border:1px solid #FFCCD5; border-radius:8px; padding:4px 6px; font-weight:700; color:#2D1E22; font-family:inherit; background:#FFF;"></span>
+                            <span>⏰ <input type="time" class="ev-time" value="${ev.time}" style="border:1px solid #FFCCD5; border-radius:8px; padding:4px 6px; font-weight:700; color:#2D1E22; font-family:inherit; background:#FFF;"></span>
                         </label>
                     </div>
                     <div style="margin-bottom:6px;">
