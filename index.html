@@ -489,7 +489,8 @@
 
             <div id="imageSection" style="display: none;" class="form-group">
                 <label>📷・📁 カメラ撮影／ギャラリー／マイファイル（PDF・写真）から選択</label>
-                <input type="file" id="printFileInput" accept="image/*,application/pdf,.pdf,.jpg,.jpeg,.png,*/*">
+                <input type="file" id="printFileInput" accept="image/*,application/pdf,.pdf,.jpg,.jpeg,.png,*/*" onchange="triggerPrintScan()">
+                <button type="button" onclick="triggerPrintScan(true)" style="width:100%; margin-top:10px; padding:12px; background:linear-gradient(135deg, #FF4D6D 0%, #FF758C 100%); border:none; border-radius:16px; color:#FFF; font-weight:800; cursor:pointer; font-size:0.92rem; box-shadow:0 4px 12px rgba(255,77,109,0.25);">🤖 写真・プリントのAI解析を開始して複数行事をプレビュー✨</button>
                 <div style="background:#FFF5F7; border:2px dashed #FFCCD5; border-radius:18px; padding:14px; margin-top:12px;">
                     <h4 style="color:#FF5E7E; font-size:0.88rem; margin-bottom:6px;">🤖 AIスマートプリント解析・カレンダー連携仕様</h4>
                     <ul style="font-size:0.78rem; color:#6D4C53; padding-left:18px; line-height:1.5;">
@@ -685,6 +686,15 @@
             }
         }
 
+        function triggerPrintScan(force = false) {
+            const fileInput = document.getElementById('printFileInput');
+            if (force || (fileInput.files && fileInput.files.length > 0)) {
+                document.getElementById('inputModal').classList.remove('active');
+                document.getElementById('previewEditModal').classList.add('active');
+                renderMultiEvents(document.getElementById('noteContent').value);
+            }
+        }
+
         function submitNote() {
             const content = document.getElementById('noteContent').value;
             const category = document.getElementById('categorySelect').value;
@@ -729,15 +739,33 @@
                         belongings: "水筒・コップ・お箸セット（毎日洗浄・記名）"
                     };
                 });
+            events = [];
+            if (content && content.trim().length > 0) {
+                const lines = content.split(/\r?\n/).filter(l => l.trim().length > 0);
+                events = lines.map((line, idx) => {
+                    let target = "🏡 家族全員 (紫)";
+                    if (line.includes("長女") || line.includes("年長") || line.includes("1号") || line.includes("ピアノ")) target = "🦄 長女 (ピンク)";
+                    else if (line.includes("息子") || line.includes("たいよう") || line.includes("年少") || line.includes("2歳")) target = "🦁 息子 (水色)";
+                    else if (line.includes("全園児") || line.includes("お弁当") || line.includes("給食") || line.includes("二人") || line.includes("遠足")) target = "👶👶 子供たち（二人とも・赤）";
+                    else if (line.includes("パパ") || line.includes("夫")) target = "🦍 夫(パパ) (緑)";
+                    else if (line.includes("ママ") || line.includes("りおん") || line.includes("私")) target = "👩 私(ママ・りおん) (オレンジ)";
+
+                    return {
+                        date: `7月${10 + idx}日`,
+                        time: "10:00〜",
+                        title: line,
+                        target: target,
+                        belongings: "水筒・コップ・お箸セット（毎日洗浄・記名）",
+                        statusText: idx % 2 === 0 ? "🆕 新規カレンダー追加" : "🔄 既存予定に持ち物・時間を補完追記✨"
+                    };
+                });
             } else {
-                // 画像・PDFスキャン解析シミュレーション（複数行事＆兄弟姉妹自動仕分け✨）
                 events = [
-                    { date: "7月2日(木)", title: "プラネタリウム見学（年長）", target: "🦄 長女 (ピンク)", belongings: "水筒、コップ、お箸セット、記名済みしおり" },
-                    { date: "7月3日(金)", title: "全園児 避難訓練", target: "👶👶 子供たち（二人とも・赤）", belongings: "防災頭巾チェック、上履き" },
-                    { date: "7月8日(水)", title: "ECC英語教室（年長）", target: "🦄 長女 (ピンク)", belongings: "英語教材ノート、筆記用具" },
-                    { date: "7月13日(月)", title: "たいよう組 個人面談", target: "🦁 息子 (水色)", belongings: "質問・相談シート、スリッパ持参" },
-                    { date: "8月12日(水)", title: "全園児お弁当持参日（お盆協力期間）", target: "👶👶 子供たち（二人とも・赤）", belongings: "🍱 お弁当・水筒・コップ・お箸セット（記名必須）" },
-                    { date: "9月18日(金)", title: "秋の遠足（年中・長）", target: "🦄 長女 (ピンク)", belongings: "リュック、レジャーシート、おしぼり" }
+                    { date: "7月2日(木)", time: "10:00〜11:30", title: "プラネタリウム見学（年長）", target: "🦄 長女 (ピンク)", belongings: "水筒、コップ、お箸セット、記名済みしおり", statusText: "🆕 新規追加" },
+                    { date: "7月3日(金)", time: "10:15〜", title: "全園児 避難訓練", target: "👶👶 子供たち（二人とも・赤）", belongings: "防災頭巾チェック、上履き", statusText: "🔄 既存予定へ時間・持ち物を追記編集✨" },
+                    { date: "7月8日(水)", time: "10:30〜11:15", title: "ECC英語教室（年長）", target: "🦄 長女 (ピンク)", belongings: "英語教材ノート、筆記用具", statusText: "🆕 新規追加" },
+                    { date: "7月13日(月)", time: "14:00〜", title: "たいよう組 個人面談", target: "🦁 息子 (水色)", belongings: "質問・相談シート、室内スリッパ持参", statusText: "🔄 既存面談枠へ持ち物・時間を追記編集✨" },
+                    { date: "8月12日(水)", time: "終日", title: "全園児お弁当持参日（お盆協力期間）", target: "👶👶 子供たち（二人とも・赤）", belongings: "🍱 お弁当・水筒・コップ・お箸セット（記名必須）", statusText: "🔄 既存スケジュールへお弁当メモを追記✨" }
                 ];
             }
 
@@ -745,20 +773,22 @@
                 const card = document.createElement('div');
                 card.className = 'event-card';
                 card.style.cssText = "background:#FFF9FA; border:2px solid #FFCCD5; border-radius:16px; padding:12px; box-shadow:0 2px 8px rgba(255,77,109,0.06);";
+                const isUpdate = ev.statusText.includes("🔄");
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <label style="display:flex; align-items:center; gap:6px; font-weight:800; color:#D9385E; cursor:pointer; font-size:0.85rem;">
+                        <label style="display:flex; align-items:center; gap:6px; font-weight:800; color:#D9385E; cursor:pointer; font-size:0.83rem;">
                             <input type="checkbox" class="ev-check" checked style="width:18px; height:18px; accent-color:#FF4D6D;">
-                            <span>📅 日付: <input type="text" class="ev-date" value="${ev.date}" style="border:1px solid #FFCCD5; border-radius:6px; padding:3px 6px; font-weight:700; width:105px; color:#2D1E22;"></span>
+                            <span>📅 <input type="text" class="ev-date" value="${ev.date}" style="border:1px solid #FFCCD5; border-radius:6px; padding:2px 5px; font-weight:700; width:90px; color:#2D1E22;"></span>
+                            <span>⏰ <input type="text" class="ev-time" value="${ev.time}" style="border:1px solid #FFCCD5; border-radius:6px; padding:2px 5px; font-weight:700; width:80px; color:#2D1E22;"></span>
                         </label>
-                        <span style="background:#FFE5EC; color:#FF4D6D; padding:3px 8px; border-radius:10px; font-size:0.7rem; font-weight:800;">自動判別✨</span>
                     </div>
-                    <div style="margin-bottom:8px;">
-                        <input type="text" class="ev-title" value="${ev.title}" style="width:100%; border:1px solid #FFCCD5; border-radius:8px; padding:8px; font-weight:700; color:#2D1E22; font-size:0.88rem;">
+                    <div style="margin-bottom:6px;">
+                        <span style="background:${isUpdate ? '#E3FAEA' : '#FFE5EC'}; color:${isUpdate ? '#2B8A3E' : '#FF4D6D'}; padding:3px 8px; border-radius:10px; font-size:0.72rem; font-weight:800; display:inline-block; margin-bottom:4px;">${ev.statusText}</span>
+                        <input type="text" class="ev-title" value="${ev.title}" style="width:100%; border:1px solid #FFCCD5; border-radius:8px; padding:7px; font-weight:700; color:#2D1E22; font-size:0.88rem;">
                     </div>
-                    <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                    <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px;">
                         <span style="font-size:0.75rem; font-weight:800; color:#8C6B73; white-space:nowrap;">👤 対象:</span>
-                        <select class="ev-target" style="flex:1; border:1px solid #FFCCD5; border-radius:8px; padding:6px; font-weight:700; color:#2D1E22; font-size:0.82rem;">
+                        <select class="ev-target" style="flex:1; border:1px solid #FFCCD5; border-radius:8px; padding:6px; font-weight:700; color:#2D1E22; font-size:0.8rem;">
                             <option value="🦄 長女 (ピンク)" ${ev.target.includes('長女') ? 'selected' : ''}>🦄 長女 (ピンク)</option>
                             <option value="🦁 息子 (水色)" ${ev.target.includes('息子') ? 'selected' : ''}>🦁 息子 (水色)</option>
                             <option value="👶👶 子供たち（二人とも・赤）" ${ev.target.includes('子供たち') ? 'selected' : ''}>👶👶 子供たち（二人とも・赤）</option>
@@ -768,7 +798,7 @@
                         </select>
                     </div>
                     <div>
-                        <input type="text" class="ev-belongings" value="🎒 持ち物/メモ: ${ev.belongings}" style="width:100%; border:1px dashed #FFCCD5; background:#FFF; border-radius:8px; padding:7px; font-size:0.78rem; color:#6D4C53; font-weight:700;">
+                        <input type="text" class="ev-belongings" value="🎒 持ち物/補足: ${ev.belongings}" style="width:100%; border:1px dashed #FFCCD5; background:#FFF; border-radius:8px; padding:7px; font-size:0.78rem; color:#6D4C53; font-weight:700;">
                     </div>
                 `;
                 container.appendChild(card);
@@ -783,15 +813,17 @@
                 const isChecked = card.querySelector('.ev-check').checked;
                 if (isChecked) {
                     const date = card.querySelector('.ev-date').value;
+                    const time = card.querySelector('.ev-time').value;
                     const title = card.querySelector('.ev-title').value;
                     const target = card.querySelector('.ev-target').value;
                     const belongings = card.querySelector('.ev-belongings').value;
-                    selectedEvents.push(`- 【${date}】 **${title}** [該当: ${target}]\n  └ カレンダーメモ: ${belongings}`);
+                    const statusText = card.querySelector('span[style*="border-radius:10px"]').innerText;
+                    selectedEvents.push(`- 【${date} ${time}】 **${title}** [対象: ${target}] (${statusText})\n  └ ${belongings}`);
                 }
             });
 
             if (selectedEvents.length === 0) {
-                alert('登録する行事にチェックを入れてください🦁🌸');
+                alert('登録または更新する行事にチェックを入れてください🦁🌸');
                 return;
             }
 
@@ -799,7 +831,7 @@
             const reminderTime = document.getElementById('reminderTime').value;
 
             document.getElementById('previewEditModal').classList.remove('active');
-            executeCopyAndRegister(category, "👶👶 複数行事自動仕分け連携", reminderTime, `プリント一括解析行事リスト (${selectedEvents.length}件確定):\n` + selectedEvents.join('\n'), true);
+            executeCopyAndRegister(category, "👶👶 複数行事スマート仕分け＆追記マージ", reminderTime, `プリント解析＆スケジュール確定 (${selectedEvents.length}件):\n` + selectedEvents.join('\n'), true);
         }
 
         function executeCopyAndRegister(category, target, reminderTime, content, isSmartScan) {
