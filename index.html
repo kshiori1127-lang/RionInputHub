@@ -418,7 +418,7 @@
             <div class="char-bubble" id="girlBubble">
                 予定もプリントも<br><span>パシャリとお任せ🌸✨</span>
             </div>
-            <img src="girl.png" alt="可愛い魔法少女" class="char-img" onclick="changeQuotes()">
+            <img src="girl.png" alt="りおんアイコン" id="girlImg" class="char-img" onclick="triggerTalkAndQuotes()">
         </div>
 
         <!-- 中央：最強の厳選3大シャボン玉ボタン -->
@@ -634,9 +634,29 @@
             }, 300);
         }
 
+        function triggerTalkAndQuotes() {
+            changeQuotes();
+            const gImg = document.getElementById('girlImg');
+            if (gImg) {
+                gImg.src = 'girl_talk.png';
+                setTimeout(() => { gImg.src = 'girl.png'; }, 1000);
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             changeQuotes();
-            setInterval(changeQuotes, 9000);
+            setInterval(() => {
+                triggerTalkAndQuotes();
+            }, 9000);
+
+            // 4秒おきに0.18秒だけ目を閉じる（まばたきアニメーション✨）
+            setInterval(() => {
+                const gImg = document.getElementById('girlImg');
+                if (gImg && gImg.src.includes('girl.png')) {
+                    gImg.src = 'girl_blink.png';
+                    setTimeout(() => { if (gImg) gImg.src = 'girl.png'; }, 180);
+                }
+            }, 4200);
         });
 
         let isRecording = false;
