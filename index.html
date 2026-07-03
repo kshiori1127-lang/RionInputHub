@@ -505,8 +505,11 @@
             <!-- リマインダー日時選択（リマインダー選択時のみ表示） -->
             <div id="reminderSection" style="display: none;" class="form-group">
                 <label>⏰ 通知日時・リマインダー設定</label>
-                <input type="datetime-local" id="reminderTime" style="background: #FFF0F3; border-color: var(--salmon-primary);">
-                <p style="font-size:0.75rem; color:#FF5E7E; margin-top:4px; font-weight:800;">💡 Galaxy（サムスン純正カレンダー）と自動同期されます！</p>
+                <div style="display:flex; gap:8px;">
+                    <input type="date" id="remDate" style="flex:1; background: #FFF0F3; border:1px solid var(--salmon-primary); border-radius:10px; padding:8px; font-weight:700; color:#2D1E22;">
+                    <input type="time" id="remTime" style="flex:1; background: #FFF0F3; border:1px solid var(--salmon-primary); border-radius:10px; padding:8px; font-weight:700; color:#2D1E22;">
+                </div>
+                <p style="font-size:0.75rem; color:#FF5E7E; margin-top:4px; font-weight:800;">💡 日付と時刻をタップでピッカーホイール起動！Galaxy純正カレンダーと連携✨</p>
             </div>
 
             <!-- 細分化した大カテゴリ選択 -->
@@ -716,7 +719,9 @@
         function submitNote() {
             const content = document.getElementById('noteContent').value;
             const category = document.getElementById('categorySelect').value;
-            const reminderTime = document.getElementById('reminderTime').value;
+            const rDate = document.getElementById('remDate') ? document.getElementById('remDate').value : '';
+            const rTime = document.getElementById('remTime') ? document.getElementById('remTime').value : '';
+            const reminderTime = (rDate || rTime) ? `${rDate} ${rTime}`.trim() : '';
             const tags = Array.from(document.querySelectorAll('.tag-checkbox:checked')).map(cb => cb.value);
             const isImageScan = document.getElementById('imageSection').style.display !== 'none';
 
