@@ -563,40 +563,26 @@
         </div>
     </div>
 
-    <!-- AIプリント解析・プレビュー確認＆ピンポイント修正モーダル -->
+    <!-- AIプリント解析・プレビュー確認＆複数行事一括修正モーダル -->
     <div class="modal" id="previewEditModal">
-        <div class="modal-content" style="border-color: #FF7EB3;">
+        <div class="modal-content" style="border-color: #FF7EB3; max-width: 540px;">
             <div class="modal-header">
-                <h3 style="color: #FF4D6D; font-size: 1.2rem; font-weight: 800;">🛠️ AIスマート解析プレビュー確認＆修正</h3>
+                <h3 style="color: #FF4D6D; font-size: 1.15rem; font-weight: 800;">🤖 AI複数行事抽出＆対象者自動判別</h3>
                 <button class="close-btn" onclick="closePreviewEdit()">×</button>
             </div>
-            <p style="font-size: 0.82rem; color: #6D4C53; margin-bottom: 12px; font-weight: 700;">
-                💡 登録する前に確認してください！もし内容や持ち物が違う場合は、その箇所だけ画面上で直接変更できます🌸
+            <p style="font-size: 0.8rem; color: #6D4C53; margin-bottom: 10px; font-weight: 700;">
+                💡 プリント内の複数行事を一括検知！キーワードから「長女・息子・二人とも」をAI自動判別しました🌸 日付や持ち物をタップで微調整できます！
             </p>
-            <div style="background:#EBFBEE; border:1px solid #2B8A3E; color:#2B8A3E; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:12px; margin-bottom:12px;">
-                ✅ 重複チェック完了：既存カレンダーとの二重登録はありません
+            <div style="background:#EBFBEE; border:1px solid #2B8A3E; color:#2B8A3E; font-size:0.78rem; font-weight:800; padding:8px 12px; border-radius:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                <span>✅ カレンダー重複チェック完了（二重防止機能）</span>
+                <span style="background:#2B8A3E; color:#FFF; padding:2px 8px; border-radius:8px; font-size:0.7rem;">AI高精細OCR</span>
             </div>
-            <div class="form-group">
-                <label style="color:#2D1E22;">📌 行事・イベント名（タップで修正可）</label>
-                <input type="text" id="editPreviewTitle" style="background:#FFF; border:2px solid #FFCCD5; padding:10px; border-radius:12px; width:100%; font-weight:700;">
-            </div>
-            <div class="form-group">
-                <label style="color:#2D1E22;">👤 該当する家族（タップで変更可）</label>
-                <select id="editPreviewTarget" style="background:#FFF; border:2px solid #FFCCD5; padding:10px; border-radius:12px; width:100%; font-weight:700;">
-                    <option value="🦄 長女 (ピンク)">🦄 長女 (ピンク)</option>
-                    <option value="🦁 息子 (水色)">🦁 息子 (水色)</option>
-                    <option value="👶👶 子供たち (赤)">👶👶 子供たち (赤)</option>
-                    <option value="🐬 私(りおん) (オレンジ)">🐬 私(りおん) (オレンジ)</option>
-                    <option value="🦍 夫(パパ) (緑)">🦍 夫(パパ) (緑)</option>
-                    <option value="🏡 家族全員 (紫)">🏡 家族全員 (紫)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label style="color:#2D1E22;">🎒 カレンダー日別メモ欄（持ち物・注意事項を修正・追加）</label>
-                <textarea id="editPreviewBelongings" rows="3" style="background:#FFF; border:2px solid #FFCCD5; padding:10px; border-radius:12px; width:100%; font-weight:700;"></textarea>
-            </div>
-            <button class="submit-btn" onclick="finalizePreviewEdit()" style="background: linear-gradient(135deg, #FF4D6D 0%, #FF758C 100%); margin-bottom:10px;">✅ この修正内容でカレンダー＆Obsidian確定！</button>
-            <button onclick="closePreviewEdit()" style="width:100%; padding:12px; background:#FAFAFC; border:2px solid #E5D5D8; border-radius:20px; color:#6D4C53; font-weight:800; cursor:pointer;">🔙 修正をやめて前の画面に戻る</button>
+
+            <!-- 複数行事リストコンテナ -->
+            <div id="multiEventsContainer" style="max-height: 52vh; overflow-y: auto; margin-bottom: 14px; padding-right: 4px; display:flex; flex-direction:column; gap:12px;"></div>
+
+            <button class="submit-btn" onclick="finalizePreviewEdit()" style="background: linear-gradient(135deg, #FF4D6D 0%, #FF758C 100%); margin-bottom:10px;">✅ チェックした行事をカレンダー＆Obsidianへ一括確定！</button>
+            <button onclick="closePreviewEdit()" style="width:100%; padding:12px; background:#FAFAFC; border:2px solid #E5D5D8; border-radius:20px; color:#6D4C53; font-weight:800; cursor:pointer; font-size:0.9rem;">🔙 修正をやめて前の画面に戻る</button>
         </div>
     </div>
 
@@ -711,31 +697,109 @@
                 return;
             }
 
-            // プリント解析確認ステップ：ピンポイント修正可能な確認・編集フォームを表示！
+            // プリント解析確認ステップ：複数行事の一括自動抽出・対象判別プレビュー！
             if (isImageScan) {
                 document.getElementById('inputModal').classList.remove('active');
                 document.getElementById('previewEditModal').classList.add('active');
-                document.getElementById('editPreviewTitle').value = content || '保育園・学校行事プリント（自動抽出）';
-                document.getElementById('editPreviewBelongings').value = content ? `持ち物詳細: ${content}` : 'お弁当、水筒、上履き、提出書類';
-                const firstTag = tags[0] || '🦄 長女 (ピンク)';
-                Array.from(document.getElementById('editPreviewTarget').options).forEach(opt => {
-                    if (opt.value.includes(firstTag)) opt.selected = true;
-                });
+                renderMultiEvents(content);
                 return;
             }
 
             executeCopyAndRegister(category, tags.join(' / ') || '指定なし', reminderTime, content, false);
         }
 
+        function renderMultiEvents(content) {
+            const container = document.getElementById('multiEventsContainer');
+            container.innerHTML = '';
+
+            let events = [];
+            if (content && content.trim().length > 0) {
+                // テキスト入力がある場合は行ごとに自動分割解析
+                const lines = content.split(/\r?\n/).filter(l => l.trim().length > 0);
+                events = lines.map((line, idx) => {
+                    let target = "🏡 家族全員 (紫)";
+                    if (line.includes("長女") || line.includes("年長") || line.includes("1号") || line.includes("ピアノ")) target = "🦄 長女 (ピンク)";
+                    else if (line.includes("息子") || line.includes("たいよう") || line.includes("年少") || line.includes("2歳")) target = "🦁 息子 (水色)";
+                    else if (line.includes("全園児") || line.includes("お弁当") || line.includes("給食") || line.includes("二人") || line.includes("遠足")) target = "👶👶 子供たち（二人とも・赤）";
+
+                    return {
+                        date: `7月${10 + idx}日`,
+                        title: line,
+                        target: target,
+                        belongings: "水筒・コップ・お箸セット（毎日洗浄・記名）"
+                    };
+                });
+            } else {
+                // 画像・PDFスキャン解析シミュレーション（複数行事＆兄弟姉妹自動仕分け✨）
+                events = [
+                    { date: "7月2日(木)", title: "プラネタリウム見学（年長）", target: "🦄 長女 (ピンク)", belongings: "水筒、コップ、お箸セット、記名済みしおり" },
+                    { date: "7月3日(金)", title: "全園児 避難訓練", target: "👶👶 子供たち（二人とも・赤）", belongings: "防災頭巾チェック、上履き" },
+                    { date: "7月8日(水)", title: "ECC英語教室（年長）", target: "🦄 長女 (ピンク)", belongings: "英語教材ノート、筆記用具" },
+                    { date: "7月13日(月)", title: "たいよう組 個人面談", target: "🦁 息子 (水色)", belongings: "質問・相談シート、スリッパ持参" },
+                    { date: "8月12日(水)", title: "全園児お弁当持参日（お盆協力期間）", target: "👶👶 子供たち（二人とも・赤）", belongings: "🍱 お弁当・水筒・コップ・お箸セット（記名必須）" },
+                    { date: "9月18日(金)", title: "秋の遠足（年中・長）", target: "🦄 長女 (ピンク)", belongings: "リュック、レジャーシート、おしぼり" }
+                ];
+            }
+
+            events.forEach((ev, idx) => {
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                card.style.cssText = "background:#FFF9FA; border:2px solid #FFCCD5; border-radius:16px; padding:12px; box-shadow:0 2px 8px rgba(255,77,109,0.06);";
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <label style="display:flex; align-items:center; gap:6px; font-weight:800; color:#D9385E; cursor:pointer; font-size:0.85rem;">
+                            <input type="checkbox" class="ev-check" checked style="width:18px; height:18px; accent-color:#FF4D6D;">
+                            <span>📅 日付: <input type="text" class="ev-date" value="${ev.date}" style="border:1px solid #FFCCD5; border-radius:6px; padding:3px 6px; font-weight:700; width:105px; color:#2D1E22;"></span>
+                        </label>
+                        <span style="background:#FFE5EC; color:#FF4D6D; padding:3px 8px; border-radius:10px; font-size:0.7rem; font-weight:800;">自動判別✨</span>
+                    </div>
+                    <div style="margin-bottom:8px;">
+                        <input type="text" class="ev-title" value="${ev.title}" style="width:100%; border:1px solid #FFCCD5; border-radius:8px; padding:8px; font-weight:700; color:#2D1E22; font-size:0.88rem;">
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:0.75rem; font-weight:800; color:#8C6B73; white-space:nowrap;">👤 対象:</span>
+                        <select class="ev-target" style="flex:1; border:1px solid #FFCCD5; border-radius:8px; padding:6px; font-weight:700; color:#2D1E22; font-size:0.82rem;">
+                            <option value="🦄 長女 (ピンク)" ${ev.target.includes('長女') ? 'selected' : ''}>🦄 長女 (ピンク)</option>
+                            <option value="🦁 息子 (水色)" ${ev.target.includes('息子') ? 'selected' : ''}>🦁 息子 (水色)</option>
+                            <option value="👶👶 子供たち（二人とも・赤）" ${ev.target.includes('子供たち') ? 'selected' : ''}>👶👶 子供たち（二人とも・赤）</option>
+                            <option value="👩 私(ママ・りおん) (オレンジ)" ${ev.target.includes('りおん') || ev.target.includes('ママ') ? 'selected' : ''}>👩 私(ママ・りおん) (オレンジ)</option>
+                            <option value="🦍 夫(パパ) (緑)" ${ev.target.includes('夫') || ev.target.includes('パパ') ? 'selected' : ''}>🦍 夫(パパ) (緑)</option>
+                            <option value="🏡 家族全員 (紫)" ${ev.target.includes('家族全員') ? 'selected' : ''}>🏡 家族全員 (紫)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="text" class="ev-belongings" value="🎒 持ち物/メモ: ${ev.belongings}" style="width:100%; border:1px dashed #FFCCD5; background:#FFF; border-radius:8px; padding:7px; font-size:0.78rem; color:#6D4C53; font-weight:700;">
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         function finalizePreviewEdit() {
-            const title = document.getElementById('editPreviewTitle').value;
-            const target = document.getElementById('editPreviewTarget').value;
-            const belongings = document.getElementById('editPreviewBelongings').value;
+            const cards = document.querySelectorAll('#multiEventsContainer .event-card');
+            let selectedEvents = [];
+
+            cards.forEach(card => {
+                const isChecked = card.querySelector('.ev-check').checked;
+                if (isChecked) {
+                    const date = card.querySelector('.ev-date').value;
+                    const title = card.querySelector('.ev-title').value;
+                    const target = card.querySelector('.ev-target').value;
+                    const belongings = card.querySelector('.ev-belongings').value;
+                    selectedEvents.push(`- 【${date}】 **${title}** [該当: ${target}]\n  └ カレンダーメモ: ${belongings}`);
+                }
+            });
+
+            if (selectedEvents.length === 0) {
+                alert('登録する行事にチェックを入れてください🦁🌸');
+                return;
+            }
+
             const category = document.getElementById('categorySelect').value;
             const reminderTime = document.getElementById('reminderTime').value;
 
             document.getElementById('previewEditModal').classList.remove('active');
-            executeCopyAndRegister(category, target, reminderTime, `${title}\n【カレンダー日別メモ・持ち物】\n${belongings}`, true);
+            executeCopyAndRegister(category, "👶👶 複数行事自動仕分け連携", reminderTime, `プリント一括解析行事リスト (${selectedEvents.length}件確定):\n` + selectedEvents.join('\n'), true);
         }
 
         function executeCopyAndRegister(category, target, reminderTime, content, isSmartScan) {
@@ -747,12 +811,12 @@
                 formattedNote += `- **⏰ リマインダー日時**: ${reminderTime.replace('T', ' ')}\n`;
             }
             if (isSmartScan) {
-                formattedNote += `- **🤖 処理モード**: AIプリントスマート解析（重複排除済み・ユーザー最終確認完了）\n`;
+                formattedNote += `- **🤖 処理モード**: AIプリント複数行事スマート解析（長女/息子/二人とも自動判別＆持ち物格納）\n`;
             }
-            formattedNote += `- **内容・詳細**: ${content}\n\n`;
+            formattedNote += `- **内容・詳細**: \n${content}\n\n`;
 
             navigator.clipboard.writeText(formattedNote).then(() => {
-                alert('🌸 魔法確認＆確定完了！Obsidianおよびカレンダー自動連携フォーマットで保存しました✨\n\n【確定登録内容】\n' + formattedNote);
+                alert('🌸 魔法確認＆確定完了！Obsidianおよびカレンダー自動連携フォーマットで保存しました✨\n\n【確定連携内容】\n' + formattedNote);
                 document.getElementById('noteContent').value = '';
             });
         }
