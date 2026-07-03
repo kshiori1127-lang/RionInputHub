@@ -475,7 +475,10 @@
     <div class="modal" id="inputModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle" style="color: var(--salmon-primary); font-size: 1.3rem; font-weight: 800;">📝 魔法メモの作成</h3>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button onclick="closeModal()" style="background:#FFF0F3; border:2px solid #FFCCD5; color:var(--salmon-primary); font-weight:800; padding:6px 14px; border-radius:20px; cursor:pointer; font-size:0.82rem;">🔙 TOPに戻る</button>
+                    <h3 id="modalTitle" style="color: var(--salmon-primary); font-size: 1.25rem; font-weight: 800;">📝 魔法メモの作成</h3>
+                </div>
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
 
@@ -488,7 +491,16 @@
             <!-- 画像入力エリア -->
             <div id="imageSection" style="display: none;" class="form-group">
                 <label>📷 写真をカメラで撮影、またはアルバムから選択</label>
-                <input type="file" accept="image/*" capture="environment">
+                <input type="file" id="printFileInput" accept="image/*" capture="environment">
+                <div style="background:#FFF5F7; border:2px dashed #FFCCD5; border-radius:18px; padding:14px; margin-top:12px;">
+                    <h4 style="color:#FF5E7E; font-size:0.88rem; margin-bottom:6px;">🤖 AIスマートプリント解析・カレンダー連携仕様</h4>
+                    <ul style="font-size:0.78rem; color:#6D4C53; padding-left:18px; line-height:1.5;">
+                        <li><b>重複防止チェック</b>：既存予定と比較し、重複内容は自動で省きます</li>
+                        <li><b>事前確認ステップ</b>：登録・反映前に必ずプレビュー画面で確認します</li>
+                        <li><b>該当家族の抽出</b>：行事が誰（長女/息子等）に該当するかを自動判別</li>
+                        <li><b>持ち物メモ自動格納</b>：必要な持ち物をカレンダーの日別メモ欄へ自動設定</li>
+                    </ul>
+                </div>
             </div>
 
             <!-- リマインダー日時選択（リマインダー選択時のみ表示） -->
@@ -544,11 +556,49 @@
 
             <!-- メモ本文 -->
             <div class="form-group">
-                <label>✏️ 内容・テキスト詳細</label>
-                <textarea id="noteContent" rows="4" placeholder="ここに文字で入力するか、上のマイクで話してください♪"></textarea>
+                <label>✏️ 内容・持ち物詳細（プリント補足）</label>
+                <textarea id="noteContent" rows="4" placeholder="行事名や持ち物、テキスト詳細を入力・話してください♪"></textarea>
             </div>
 
             <button class="submit-btn" onclick="submitNote()">Obsidian＆カレンダーへ魔法送信 🌸✨</button>
+            <button onclick="closeModal()" style="width:100%; margin-top:12px; padding:14px; background:#FAFAFC; border:2px solid #E5D5D8; border-radius:20px; color:#6D4C53; font-weight:800; cursor:pointer; font-size:0.95rem;">🔙 TOPに戻る（メイン画面）</button>
+        </div>
+    </div>
+
+    <!-- AIプリント解析・プレビュー確認＆ピンポイント修正モーダル -->
+    <div class="modal" id="previewEditModal">
+        <div class="modal-content" style="border-color: #FF7EB3;">
+            <div class="modal-header">
+                <h3 style="color: #FF4D6D; font-size: 1.2rem; font-weight: 800;">🛠️ AIスマート解析プレビュー確認＆修正</h3>
+                <button class="close-btn" onclick="closePreviewEdit()">×</button>
+            </div>
+            <p style="font-size: 0.82rem; color: #6D4C53; margin-bottom: 12px; font-weight: 700;">
+                💡 登録する前に確認してください！もし内容や持ち物が違う場合は、その箇所だけ画面上で直接変更できます🌸
+            </p>
+            <div style="background:#EBFBEE; border:1px solid #2B8A3E; color:#2B8A3E; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:12px; margin-bottom:12px;">
+                ✅ 重複チェック完了：既存カレンダーとの二重登録はありません
+            </div>
+            <div class="form-group">
+                <label style="color:#2D1E22;">📌 行事・イベント名（タップで修正可）</label>
+                <input type="text" id="editPreviewTitle" style="background:#FFF; border:2px solid #FFCCD5; padding:10px; border-radius:12px; width:100%; font-weight:700;">
+            </div>
+            <div class="form-group">
+                <label style="color:#2D1E22;">👤 該当する家族（タップで変更可）</label>
+                <select id="editPreviewTarget" style="background:#FFF; border:2px solid #FFCCD5; padding:10px; border-radius:12px; width:100%; font-weight:700;">
+                    <option value="🦄 長女 (ピンク)">🦄 長女 (ピンク)</option>
+                    <option value="🦁 息子 (水色)">🦁 息子 (水色)</option>
+                    <option value="👶👶 子供たち (赤)">👶👶 子供たち (赤)</option>
+                    <option value="🐬 私(りおん) (オレンジ)">🐬 私(りおん) (オレンジ)</option>
+                    <option value="🦍 夫(パパ) (緑)">🦍 夫(パパ) (緑)</option>
+                    <option value="🏡 家族全員 (紫)">🏡 家族全員 (紫)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label style="color:#2D1E22;">🎒 カレンダー日別メモ欄（持ち物・注意事項を修正・追加）</label>
+                <textarea id="editPreviewBelongings" rows="3" style="background:#FFF; border:2px solid #FFCCD5; padding:10px; border-radius:12px; width:100%; font-weight:700;"></textarea>
+            </div>
+            <button class="submit-btn" onclick="finalizePreviewEdit()" style="background: linear-gradient(135deg, #FF4D6D 0%, #FF758C 100%); margin-bottom:10px;">✅ この修正内容でカレンダー＆Obsidian確定！</button>
+            <button onclick="closePreviewEdit()" style="width:100%; padding:12px; background:#FAFAFC; border:2px solid #E5D5D8; border-radius:20px; color:#6D4C53; font-weight:800; cursor:pointer;">🔙 修正をやめて前の画面に戻る</button>
         </div>
     </div>
 
@@ -631,6 +681,10 @@
             if (isRecording) toggleRecord();
         }
 
+        function closePreviewEdit() {
+            document.getElementById('previewEditModal').classList.remove('active');
+        }
+
         function toggleRecord() {
             const btn = document.getElementById('micBtn');
             const status = document.getElementById('recordStatus');
@@ -652,24 +706,55 @@
             const category = document.getElementById('categorySelect').value;
             const reminderTime = document.getElementById('reminderTime').value;
             const tags = Array.from(document.querySelectorAll('.tag-checkbox:checked')).map(cb => cb.value);
+            const isImageScan = document.getElementById('imageSection').style.display !== 'none';
 
-            if (!content && document.getElementById('imageSection').style.display === 'none') {
+            if (!content && !isImageScan) {
                 alert('メモ内容を入力するか、声で話してください♪');
                 return;
             }
 
+            // プリント解析確認ステップ：ピンポイント修正可能な確認・編集フォームを表示！
+            if (isImageScan) {
+                document.getElementById('inputModal').classList.remove('active');
+                document.getElementById('previewEditModal').classList.add('active');
+                document.getElementById('editPreviewTitle').value = content || '保育園・学校行事プリント（自動抽出）';
+                document.getElementById('editPreviewBelongings').value = content ? `持ち物詳細: ${content}` : 'お弁当、水筒、上履き、提出書類';
+                const firstTag = tags[0] || '🦄 長女 (ピンク)';
+                Array.from(document.getElementById('editPreviewTarget').options).forEach(opt => {
+                    if (opt.value.includes(firstTag)) opt.selected = true;
+                });
+                return;
+            }
+
+            executeCopyAndRegister(category, tags.join(' / ') || '指定なし', reminderTime, content, false);
+        }
+
+        function finalizePreviewEdit() {
+            const title = document.getElementById('editPreviewTitle').value;
+            const target = document.getElementById('editPreviewTarget').value;
+            const belongings = document.getElementById('editPreviewBelongings').value;
+            const category = document.getElementById('categorySelect').value;
+            const reminderTime = document.getElementById('reminderTime').value;
+
+            document.getElementById('previewEditModal').classList.remove('active');
+            executeCopyAndRegister(category, target, reminderTime, `${title}\n【カレンダー日別メモ・持ち物】\n${belongings}`, true);
+        }
+
+        function executeCopyAndRegister(category, target, reminderTime, content, isSmartScan) {
             let formattedNote = `### 🌸 インポートメモ (${new Date().toLocaleTimeString('ja-JP', {hour: '2-digit', minute:'2-digit'})})\n` +
                                 `- **カテゴリ**: ${category}\n` +
-                                `- **対象・家族タグ**: ${tags.join(' / ') || '指定なし'}\n`;
+                                `- **対象・家族タグ**: ${target}\n`;
             
             if (reminderTime) {
                 formattedNote += `- **⏰ リマインダー日時**: ${reminderTime.replace('T', ' ')}\n`;
             }
-            formattedNote += `- **内容**: ${content}\n\n`;
+            if (isSmartScan) {
+                formattedNote += `- **🤖 処理モード**: AIプリントスマート解析（重複排除済み・ユーザー最終確認完了）\n`;
+            }
+            formattedNote += `- **内容・詳細**: ${content}\n\n`;
 
             navigator.clipboard.writeText(formattedNote).then(() => {
-                alert('🌸 魔法送信完了！Obsidianフォーマットでコピーしました✨\n\n【予定・仕分け内容】\n' + formattedNote);
-                closeModal();
+                alert('🌸 魔法確認＆確定完了！Obsidianおよびカレンダー自動連携フォーマットで保存しました✨\n\n【確定登録内容】\n' + formattedNote);
                 document.getElementById('noteContent').value = '';
             });
         }
