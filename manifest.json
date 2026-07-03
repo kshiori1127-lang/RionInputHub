@@ -1,0 +1,15 @@
+{
+  "name": "Rion's Magical Input Hub",
+  "short_name": "RionHub",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FF758C",
+  "icons": [
+    {
+      "src": "girl.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
