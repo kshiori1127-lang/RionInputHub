@@ -837,7 +837,9 @@
             }
 
             const category = document.getElementById('categorySelect').value;
-            const reminderTime = document.getElementById('reminderTime').value;
+            const rDate = document.getElementById('remDate') ? document.getElementById('remDate').value : '';
+            const rTime = document.getElementById('remTime') ? document.getElementById('remTime').value : '';
+            const reminderTime = (rDate || rTime) ? `${rDate} ${rTime}`.trim() : '';
 
             document.getElementById('previewEditModal').classList.remove('active');
             executeCopyAndRegister(category, "👶👶 複数行事スマート仕分け＆追記マージ", reminderTime, `プリント解析＆スケジュール確定 (${selectedEvents.length}件):\n` + selectedEvents.join('\n'), true);
@@ -848,8 +850,7 @@
         }
 
         function triggerObsidian(filePath, content) {
-            const vault = "rion2nd-Brain";
-            const uri = `obsidian://new?vault=${encodeURIComponent(vault)}&file=${encodeURIComponent(filePath)}&content=${encodeURIComponent(content)}&append=true`;
+            const uri = `obsidian://new?file=${encodeURIComponent(filePath)}&content=${encodeURIComponent(content)}&append=true`;
             window.location.href = uri;
         }
 
@@ -884,7 +885,7 @@
 
                 if (isSchedule) {
                     const todayStr = new Date().toISOString().slice(0, 10);
-                    const schedFile = `2nd-Brain/01_プロジェクト/スケジュール/行事予定_${todayStr}`;
+                    const schedFile = `05_日誌/行事予定_${todayStr}`;
                     container.innerHTML = `
                         <div style="background:#EBFBEE; border:1px solid #2B8A3E; color:#2B8A3E; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:12px; margin-bottom:6px;">
                             📅 判定結果: 【スケジュール・行事】 👉 専用ファイル＆カレンダー連携
@@ -897,13 +898,13 @@
                         </button>
                     `;
                 } else {
-                    const inboxFile = `2nd-Brain/05_日誌/アイデアInbox`;
+                    const inboxFile = `04_アウトプット/00_アイデアINBOX`;
                     container.innerHTML = `
                         <div style="background:#FFF0F3; border:1px solid #FF4D6D; color:#FF4D6D; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:12px; margin-bottom:6px;">
                             💡 判定結果: 【アイデア・メモ】 👉 アイデアInboxへの格納
                         </div>
                         <button onclick="triggerObsidian('${inboxFile}', \`${formattedNote.replace(/`/g, '\\`')}\`)" style="width:100%; padding:14px; background:linear-gradient(135deg, #FF4D6D 0%, #FF758C 100%); border:none; border-radius:14px; color:#FFF; font-weight:800; cursor:pointer; font-size:0.88rem; text-align:left; display:flex; align-items:center; gap:8px; box-shadow:0 3px 8px rgba(255,77,109,0.25);">
-                            <span>1️⃣</span> <span><b>Obsidian『アイデアInbox』へ直接追記</b><br><small style="font-weight:700; opacity:0.9;">ワンタップでInboxノートへ即座に格納！</small></span>
+                            <span>1️⃣</span> <span><b>Obsidian『アイデアINBOX』へ直接追記</b><br><small style="font-weight:700; opacity:0.9;">ワンタップでInboxノートへ即座に格納！</small></span>
                         </button>
                     `;
                 }
