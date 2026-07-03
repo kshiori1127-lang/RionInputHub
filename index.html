@@ -724,23 +724,6 @@
 
             let events = [];
             if (content && content.trim().length > 0) {
-                // テキスト入力がある場合は行ごとに自動分割解析
-                const lines = content.split(/\r?\n/).filter(l => l.trim().length > 0);
-                events = lines.map((line, idx) => {
-                    let target = "🏡 家族全員 (紫)";
-                    if (line.includes("長女") || line.includes("年長") || line.includes("1号") || line.includes("ピアノ")) target = "🦄 長女 (ピンク)";
-                    else if (line.includes("息子") || line.includes("たいよう") || line.includes("年少") || line.includes("2歳")) target = "🦁 息子 (水色)";
-                    else if (line.includes("全園児") || line.includes("お弁当") || line.includes("給食") || line.includes("二人") || line.includes("遠足")) target = "👶👶 子供たち（二人とも・赤）";
-
-                    return {
-                        date: `7月${10 + idx}日`,
-                        title: line,
-                        target: target,
-                        belongings: "水筒・コップ・お箸セット（毎日洗浄・記名）"
-                    };
-                });
-            events = [];
-            if (content && content.trim().length > 0) {
                 const lines = content.split(/\r?\n/).filter(l => l.trim().length > 0);
                 events = lines.map((line, idx) => {
                     let target = "🏡 家族全員 (紫)";
