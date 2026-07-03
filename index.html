@@ -418,7 +418,7 @@
             <div class="char-bubble" id="girlBubble">
                 予定もプリントも<br><span>パシャリとお任せ🌸✨</span>
             </div>
-            <img src="girl.png" alt="りおんアイコン" id="girlImg" class="char-img" onclick="triggerTalkAndQuotes()">
+            <img src="girl.png?v=20260703clean" alt="りおんアイコン" id="girlImg" class="char-img" onclick="triggerTalkAndQuotes()">
         </div>
 
         <!-- 中央：最強の厳選3大シャボン玉ボタン -->
@@ -443,7 +443,7 @@
                         <h2>プリント・予定表パシャリ</h2>
                         <span class="badge-mini">✨ 魔法スキャン</span>
                     </div>
-                    <p>スマホからならタップで直接カメラ起動！プリントをOCRして自動登録</p>
+                    <p>スマホカメラ起動またはアルバム選択！OCRで自動予定化＆添付</p>
                 </div>
             </div>
 
@@ -466,7 +466,7 @@
             <div class="char-bubble" id="lionBubble">
                 喋るだけでサクッと<br><span>仕分け登録するがおー🦁🫧</span>
             </div>
-            <img src="lion.png" alt="妖精ライオンくん" class="char-img" onclick="changeQuotes()">
+            <img src="lion.png?v=20260703clean" alt="妖精ライオンくん" class="char-img" onclick="changeQuotes()">
         </div>
 
     </div>
@@ -638,8 +638,8 @@
             changeQuotes();
             const gImg = document.getElementById('girlImg');
             if (gImg) {
-                gImg.src = 'girl_talk.png';
-                setTimeout(() => { gImg.src = 'girl.png'; }, 1000);
+                gImg.src = 'girl_talk.png?v=20260703clean';
+                setTimeout(() => { gImg.src = 'girl.png?v=20260703clean'; }, 1000);
             }
         }
 
@@ -653,8 +653,8 @@
             setInterval(() => {
                 const gImg = document.getElementById('girlImg');
                 if (gImg && gImg.src.includes('girl.png')) {
-                    gImg.src = 'girl_blink.png';
-                    setTimeout(() => { if (gImg) gImg.src = 'girl.png'; }, 180);
+                    gImg.src = 'girl_blink.png?v=20260703clean';
+                    setTimeout(() => { if (gImg) gImg.src = 'girl.png?v=20260703clean'; }, 180);
                 }
             }, 4200);
         });
