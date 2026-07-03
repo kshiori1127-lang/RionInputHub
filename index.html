@@ -140,13 +140,12 @@
             50% { transform: translateY(-4px); }
         }
 
-        /* キャラクター画像（ドロップシャドウを外して四角い影枠を完全消滅！） */
+        /* キャラクター画像（輪郭線切り抜きステッカー） */
         .char-img {
             width: 100%;
             max-width: 275px;
             height: auto;
             object-fit: contain;
-            mix-blend-mode: multiply; /* 純白#FFFFFF背景と100%同化し、四角い枠が完全に消滅します */
             animation: floatChar 4s ease-in-out infinite;
             cursor: pointer;
         }
@@ -418,7 +417,7 @@
             <div class="char-bubble" id="girlBubble">
                 予定もプリントも<br><span>パシャリとお任せ🌸✨</span>
             </div>
-            <img src="girl.png?v=20260703clean" alt="りおんアイコン" id="girlImg" class="char-img" onclick="triggerTalkAndQuotes()">
+            <img src="girl.png?v=20260703cute" alt="りおんアイコン" id="girlImg" class="char-img" onclick="changeQuotes()">
         </div>
 
         <!-- 中央：最強の厳選3大シャボン玉ボタン -->
@@ -466,7 +465,7 @@
             <div class="char-bubble" id="lionBubble">
                 喋るだけでサクッと<br><span>仕分け登録するがおー🦁🫧</span>
             </div>
-            <img src="lion.png?v=20260703clean" alt="妖精ライオンくん" class="char-img" onclick="changeQuotes()">
+            <img src="lion.png?v=20260703final" alt="妖精ライオンくん" class="char-img" onclick="changeQuotes()">
         </div>
 
     </div>
@@ -634,29 +633,9 @@
             }, 300);
         }
 
-        function triggerTalkAndQuotes() {
-            changeQuotes();
-            const gImg = document.getElementById('girlImg');
-            if (gImg) {
-                gImg.src = 'girl_talk.png?v=20260703clean';
-                setTimeout(() => { gImg.src = 'girl.png?v=20260703clean'; }, 1000);
-            }
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
             changeQuotes();
-            setInterval(() => {
-                triggerTalkAndQuotes();
-            }, 9000);
-
-            // 4秒おきに0.18秒だけ目を閉じる（まばたきアニメーション✨）
-            setInterval(() => {
-                const gImg = document.getElementById('girlImg');
-                if (gImg && gImg.src.includes('girl.png')) {
-                    gImg.src = 'girl_blink.png?v=20260703clean';
-                    setTimeout(() => { if (gImg) gImg.src = 'girl.png?v=20260703clean'; }, 180);
-                }
-            }, 4200);
+            setInterval(changeQuotes, 9000);
         });
 
         let isRecording = false;
