@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🌸 Rion's Magical Input Hub 🌸</title>
     <link rel="manifest" href="./manifest.json">
-    <link rel="apple-touch-icon" href="./girl.png">
-    <link rel="icon" type="image/png" href="./girl.png">
+    <link rel="apple-touch-icon" href="./icon-512.png">
+    <link rel="icon" type="image/png" href="./icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -280,11 +280,44 @@
         }
 
         @media (max-width: 850px) {
-            .stage-wrapper { flex-direction: column; }
-            .char-side { flex-direction: row; gap: 16px; max-width: 100%; justify-content: center; }
-            .char-img { width: 130px; max-width: 130px; }
-            .char-bubble { margin-bottom: 0; font-size: 0.8rem; }
-            .char-bubble::after { display: none; }
+            .stage-wrapper {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                width: 100%;
+                align-items: end;
+            }
+            .stage-wrapper > .char-side:first-child {
+                grid-column: 1 / 2;
+                grid-row: 1 / 2;
+                flex-direction: column;
+                justify-content: flex-end;
+                align-items: center;
+                gap: 6px;
+                max-width: 100%;
+            }
+            .stage-wrapper > .char-side:last-child {
+                grid-column: 2 / 3;
+                grid-row: 1 / 2;
+                flex-direction: column;
+                justify-content: flex-end;
+                align-items: center;
+                gap: 6px;
+                max-width: 100%;
+            }
+            .stage-wrapper > .container {
+                grid-column: 1 / 3;
+                grid-row: 2 / 3;
+                width: 100%;
+                margin-top: 6px;
+            }
+            .char-img { width: 120px; max-width: 120px; }
+            .char-bubble { 
+                margin-bottom: 4px; 
+                font-size: 0.78rem; 
+                padding: 8px 10px;
+                min-height: auto;
+            }
             .title-header-row { flex-direction: column; align-items: flex-start; gap: 4px; }
         }
 
@@ -894,7 +927,7 @@
                 const fmt = d => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
                 
                 const start = fmt(dt);
-                const endDt = new Date(dt.getTime() + 60 * 60 * 1000); // 1時間後の終了時刻
+                const endDt = new Date(dt.getTime() + 60 * 60 * 1000); 
                 const end = fmt(endDt);
                 return `${start}/${end}`;
             } catch(e) {
@@ -908,7 +941,7 @@
                 const datesStr = formatGoogleCalendarDates(reminderTime);
                 if (datesStr) uri += `&dates=${datesStr}`;
             }
-            uri += `&ctz=Asia/Tokyo`; // 日本標準時で完全固定！タイムゾーンずれを100%防止！
+            uri += `&ctz=Asia/Tokyo`;
             window.open(uri, '_blank');
         }
 
@@ -931,7 +964,6 @@
                 const modalEl = document.getElementById('inputModal');
                 if (modalEl) modalEl.classList.remove('active');
 
-                // 自動振り分け判定
                 const isSchedule = isSmartScan || category.includes('予定') || category.includes('行事') || category.includes('子供') || reminderTime !== '';
                 const container = document.getElementById('syncActionContent');
                 container.innerHTML = '';
@@ -941,20 +973,21 @@
                     const schedFile = `05_日誌/行事予定_${todayStr}`;
                     
                     if (isSmartScan && multiEvents && multiEvents.length > 0) {
-                        // 複数行事スキャンの場合：個別行事ごとのワンタップ登録ボタンを生成！
                         let calButtonsHtml = '';
                         multiEvents.forEach((ev, idx) => {
-                            let shortTarget = '【予定】';
-                            if (ev.target.includes('ゆい')) shortTarget = '【ゆい】';
-                            else if (ev.target.includes('ちひろ')) shortTarget = '【ちひろ】';
-                            else if (ev.target.includes('二人とも') || ev.target.includes('ゆい＆ちひろ')) shortTarget = '【ゆい＆ちひろ】';
-                            else if (ev.target.includes('パパ')) shortTarget = '【パパ】';
-                            else if (ev.target.includes('ママ')) shortTarget = '【ママ】';
-                            else if (ev.target.includes('家族全員')) shortTarget = '【家族全員】';
+                            let shortTarget = '🗓️';
+                            if (ev.target.includes('ゆい')) shortTarget = '🦄';
+                            else if (ev.target.includes('ちひろ')) shortTarget = '🦁';
+                            else if (ev.target.includes('二人とも') || ev.target.includes('ゆい＆ちひろ')) shortTarget = '👶👶';
+                            else if (ev.target.includes('パパ')) shortTarget = '🦍';
+                            else if (ev.target.includes('ママ')) shortTarget = '👩';
+                            else if (ev.target.includes('家族全員')) shortTarget = '🏡';
 
                             const cleanTitle = ev.title.replace(/^[-*#\s]+/, '').trim();
                             const fullTitle = `${shortTarget} ${cleanTitle}`;
-                            const details = `👤 対象: ${ev.target}\n🎒 持ち物・補足: ${ev.belongings}\n📌 状態: ${ev.statusText}\n\n🌸 Shiori's Input Hub（AIプリントスマート解析）より自動登録`;
+                            const cleanBelongings = (ev.belongings || '').replace(/^🎒?\s*持ち物[\/\・]補足:?\s*/, '').trim();
+                            const detailsStr = cleanBelongings ? `🎒 持ち物・補足: ${cleanBelongings}\n\n` : '';
+                            const details = `${detailsStr}🌸 Shiori's Input Hub（AIプリントスマート解析）より自動登録`;
                             const evDateTime = `${ev.date} ${ev.time}`.trim();
                             
                             let dateLabel = ev.date;
