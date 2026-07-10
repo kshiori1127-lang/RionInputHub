@@ -515,26 +515,20 @@
                     <div class="bubble-title">プリント<span class="bubble-sub">魔法OCRスキャン</span></div>
                 </div>
 
-                <!-- 3. 予定＆リマインダー設定 -->
-                <div class="bubble-btn" onclick="openModal('reminder')">
-                    <div class="bubble-icon">⏰</div>
-                    <div class="bubble-title">予定・ToDo<span class="bubble-sub">Galaxy同期</span></div>
-                </div>
-
-                <!-- 4. 朝の開始宣言（/today-start） -->
+                <!-- 3. 朝の開始宣言（/today-start） -->
                 <div class="bubble-btn" onclick="openModal('start')">
                     <div class="bubble-icon">🌅</div>
                     <div class="bubble-title">朝の開始<span class="bubble-sub">/today-start</span></div>
                 </div>
 
-                <!-- 5. 夜の完了（/today-finish） -->
+                <!-- 4. 夜の完了（/today-finish） -->
                 <div class="bubble-btn" onclick="openModal('finish')">
                     <div class="bubble-icon">🌙</div>
                     <div class="bubble-title">夜の完了<span class="bubble-sub">/today-finish</span></div>
                 </div>
 
-                <!-- 6. 今日これどう？スキマ提案 -->
-                <div class="bubble-btn" onclick="openModal('suggest')">
+                <!-- 5. 今日これどう？スキマ提案（中央ワイド浮遊） -->
+                <div class="bubble-btn" onclick="openModal('suggest')" style="grid-column: 1 / -1; transform: translateY(12px) !important;">
                     <div class="bubble-icon">🎁</div>
                     <div class="bubble-title">スキマ提案<span class="bubble-sub">ピンポイント</span></div>
                 </div>
@@ -572,10 +566,16 @@
                 💡 声で喋っても文字で打ってもOK！思いつきを1秒でObsidianへ投函します🌸
             </div>
 
-            <!-- 音声入力マイク -->
+            <!-- 音声入力マイク＆Whisper連携 -->
             <div id="voiceSection" style="display: none;" class="voice-recording-area">
+                <div style="background:#FFF5F7; border:2px dashed #FFCCD5; border-radius:16px; padding:12px; margin-bottom:12px; text-align:left;">
+                    <p style="font-size:0.82rem; color:#D9385E; font-weight:800; margin-bottom:6px;">🎙️ 【進化仕様】高精細Whisper（PC連携）モード✨</p>
+                    <p style="font-size:0.75rem; color:#6D4C53; font-weight:700; line-height:1.4;">
+                        ブラウザ音声認識の誤字や文字重複を防ぎたいときは、「音声データそのまま」の保存がおすすめ！パソコンのWhisper高精度モデルで自動綺麗文字起こし＆日誌・ポストへ連動します🦁
+                    </p>
+                </div>
                 <button class="mic-btn" id="micBtn" onclick="toggleRecord()">🎤</button>
-                <p id="recordStatus" style="font-size: 0.88rem; color: #8C6B73; font-weight: 800;">🦁 マイクをタップして声で話すか、下に入力してね！</p>
+                <p id="recordStatus" style="font-size: 0.88rem; color: #8C6B73; font-weight: 800;">🦁 マイクをタップして話すか、下に入力してね！</p>
             </div>
 
             <div id="imageSection" style="display: none;" class="form-group">
@@ -591,28 +591,23 @@
                 </div>
             </div>
 
-            <!-- リマインダー日時選択 -->
-            <div id="reminderSection" style="display: none;" class="form-group">
-                <label>⏰ 通知日時・リマインダー設定</label>
+            <!-- リマインダー・カレンダー日時選択（カレンダー＆ToDoでは日付指定必須・ピッカー起動） -->
+            <div id="reminderSection" style="display: none; background: #FFF9FA; border: 2px solid #FFCCD5; border-radius: 16px; padding: 12px; margin-bottom: 14px;" class="form-group">
+                <label id="reminderLabel" style="color: #D9385E; font-weight: 800; display: block; margin-bottom: 6px;">📅 指定する日（カレンダー予定日・ToDo期日）を選んでね🌸</label>
                 <div style="display:flex; gap:8px;">
-                    <input type="date" id="remDate" style="flex:1; background: #FFF0F3; border:1px solid var(--salmon-primary); border-radius:10px; padding:8px; font-weight:700; color:#2D1E22;">
-                    <input type="time" id="remTime" style="flex:1; background: #FFF0F3; border:1px solid var(--salmon-primary); border-radius:10px; padding:8px; font-weight:700; color:#2D1E22;">
+                    <input type="date" id="remDate" style="flex:1; background: #FFF; border:1px solid var(--salmon-primary); border-radius:10px; padding:8px; font-weight:700; color:#2D1E22;">
+                    <input type="time" id="remTime" style="flex:1; background: #FFF; border:1px solid var(--salmon-primary); border-radius:10px; padding:8px; font-weight:700; color:#2D1E22;">
                 </div>
-                <p style="font-size:0.75rem; color:#FF5E7E; margin-top:4px; font-weight:800;">💡 日付と時刻をタップでピッカー起動！Galaxy純正カレンダーと連携✨</p>
+                <p id="reminderSubDesc" style="font-size:0.75rem; color:#FF5E7E; margin-top:4px; font-weight:800;">💡 日付と時刻をタップでピッカー起動！Googleカレンダー＆Google ToDoと自動連携✨</p>
             </div>
 
-            <!-- 細分化した大カテゴリ選択 -->
+            <!-- 究極の3分類カテゴリ選択 -->
             <div class="form-group" id="categoryGroup">
-                <label>🏷️ カテゴリ詳細仕分け（8分類）</label>
-                <select id="categorySelect">
-                    <option value="🏢 本業・タスク・オフィス業務">🏢 本業・タスク・オフィス業務</option>
-                    <option value="💰 副業・ポイ活・アンケート">💰 副業・ポイ活・アンケート</option>
-                    <option value="🛍️ お買い物・欲しいものリスト">🛍️ お買い物・欲しいものリスト</option>
-                    <option value="👶 子供・学校・保育園行事">👶 子供・学校・保育園行事</option>
-                    <option value="🥗 健康・美容・ダイエットログ">🥗 健康・美容・ダイエットログ</option>
-                    <option value="💡 アイデア・思考のひらめき">💡 アイデア・思考のひらめき</option>
-                    <option value="🗓️ 予定・お出かけ・イベント">🗓️ 予定・お出かけ・イベント</option>
-                    <option value="🏠 家事・家庭・管理手続き">🏠 家事・家庭・管理手続き</option>
+                <label>🏷️ カテゴリ仕分け（迷わない究極の3分類🌸）</label>
+                <select id="categorySelect" onchange="onCategoryChange()">
+                    <option value="💡 アウトプット（思考・アイデア・記録・タスク）">1. 💡 アウトプット（思考・アイデア・記録・タスク）</option>
+                    <option value="🗓️ カレンダー（Googleカレンダー連携・持ち物/場所のみ・重複時は追記）">2. 🗓️ カレンダー（Googleカレンダー連携・持ち物/場所のみ・重複時は追記）</option>
+                    <option value="☑️ リマインダー（Google ToDo / Tasks連携）">3. ☑️ リマインダー（Google ToDo / Tasks連携）</option>
                 </select>
             </div>
 
@@ -647,9 +642,10 @@
                 </div>
             </div>
 
-            <!-- メモ本文 -->
+            <!-- メモ・詳細本文 -->
             <div class="form-group">
-                <label>✏️ 内容・持ち物詳細（プリント補足）</label>
+                <div id="smartGuideBanner" style="display:none; background:#FFF5F7; border:1px dashed #FF4D6D; border-radius:12px; padding:8px 10px; margin-bottom:8px; font-size:0.76rem; color:#D9385E; font-weight:800; line-height:1.4;"></div>
+                <label id="noteContentLabel">✏️ 内容・詳細（アイデア・思考メモ）</label>
                 <textarea id="noteContent" rows="4" placeholder="行事名や持ち物、テキスト詳細を入力・話してください♪"></textarea>
             </div>
 
@@ -696,7 +692,11 @@
                 <h3 style="color: #FF5E7E; font-size: 1.15rem; font-weight: 800;">🌸 今日のフィードバック＆日誌・ポスト確認</h3>
                 <button class="close-btn" onclick="closeTodayHub()">×</button>
             </div>
-            <div id="todayHubDateDisplay" style="text-align:center; margin-bottom:14px;"></div>
+            <div id="todayHubDateDisplay" style="text-align:center; margin-bottom:10px;"></div>
+            <div style="display:flex; justify-content:center; gap:8px; margin-bottom:14px;">
+                <button onclick="refreshTodayHub()" style="background:#4A3238; color:#FFF; border:none; padding:5px 12px; border-radius:12px; font-size:0.75rem; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.1);">🔄 最新に更新</button>
+                <button onclick="clearTodayHub()" style="background:#FFF; color:#D9385E; border:1px solid #FFCCD5; padding:5px 12px; border-radius:12px; font-size:0.75rem; font-weight:800; cursor:pointer;">🗑️ ログをクリア</button>
+            </div>
             <div class="modal-desc" style="background:#F4F9FF; border-color:#D0E3FF; font-size:0.85rem;">
                 💡 朝夜の宣言から生成された「日誌・Note・ポスト案」の確認＆Obsidian起動ハブ✨<br>
                 <small style="color:#2B8A3E; font-weight:700;">※ 「📱 Obsidianで開く」をタップすると、スマホのObsidianで該当ファイルが開きます。</small>
@@ -732,6 +732,20 @@
                     </div>
                     <div id="hubPostContent" style="display:flex; flex-direction:column; gap:10px;"></div>
                 </div>
+            </div>
+
+            <!-- ⚙️ 無料GASサーバー URL設定（保護・安全設計） -->
+            <div style="background:#FFF9FA; border:1px dashed #D9385E; border-radius:14px; padding:10px 12px; margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span style="font-size:0.78rem; font-weight:800; color:#D9385E; display:flex; align-items:center; gap:4px;">
+                        ⚙️ 無料GASサーバー接続 <span id="gasLockBadge" style="background:#EBFBEE; color:#2B8A3E; padding:1px 6px; border-radius:8px; font-size:0.68rem; display:none;">🔒 保護中</span>
+                    </span>
+                    <div style="display:flex; gap:6px;">
+                        <button id="unlockGasBtn" onclick="unlockGasUrl()" style="background:#868E96; color:#FFF; border:none; padding:4px 8px; border-radius:8px; font-size:0.7rem; font-weight:800; cursor:pointer; display:none;">🔓 変更/解除</button>
+                        <button id="saveGasBtn" onclick="saveGasUrl()" style="background:#2B8A3E; color:#FFF; border:none; padding:4px 10px; border-radius:8px; font-size:0.72rem; font-weight:800; cursor:pointer;">💾 保存・保護</button>
+                    </div>
+                </div>
+                <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%; font-size:0.73rem; padding:6px 8px; border:1px solid #FFCCD5; border-radius:8px; background:#FFF; font-family:monospace; color:#444;">
             </div>
 
             <button onclick="closeTodayHub()" style="width:100%; padding:14px; background:#FAFAFC; border:2px solid #E5D5D8; border-radius:20px; color:#6D4C53; font-weight:800; cursor:pointer; font-size:0.95rem;">🔙 TOPに戻る</button>
@@ -931,6 +945,110 @@
                 localStorage.setItem('today_hub_date', todayStr);
                 localStorage.removeItem('today_start_text');
                 localStorage.removeItem('today_finish_text');
+                localStorage.removeItem('today_start_feedback');
+                localStorage.removeItem('today_finish_feedback');
+                localStorage.removeItem('today_xpost_draft');
+            }
+        }
+
+        function saveGasUrl() {
+            const el = document.getElementById('gasUrlInput');
+            if (!el) return;
+            const url = el.value.trim();
+            if (url && !url.startsWith('https://script.google.com/')) {
+                alert('URLは https://script.google.com/ から始まるGoogle Apps ScriptのウェブアプリURLを入力してください🌸');
+                return;
+            }
+            if (url) {
+                localStorage.setItem('gas_web_url', url);
+                el.readOnly = true;
+                el.style.background = '#EBFBEE';
+                el.style.color = '#2B8A3E';
+                const badge = document.getElementById('gasLockBadge');
+                const unlockBtn = document.getElementById('unlockGasBtn');
+                const saveBtn = document.getElementById('saveGasBtn');
+                if (badge) badge.style.display = 'inline-block';
+                if (unlockBtn) unlockBtn.style.display = 'inline-block';
+                if (saveBtn) saveBtn.style.display = 'none';
+                alert('💾 無料GASクラウドAIサーバーのURLを保存・保護しました！\n誤操作や書き換えから安全にロックされています🔒✨');
+            } else {
+                localStorage.removeItem('gas_web_url');
+                el.readOnly = false;
+                el.style.background = '#FFF';
+                el.style.color = '#444';
+                const badge = document.getElementById('gasLockBadge');
+                const unlockBtn = document.getElementById('unlockGasBtn');
+                const saveBtn = document.getElementById('saveGasBtn');
+                if (badge) badge.style.display = 'none';
+                if (unlockBtn) unlockBtn.style.display = 'none';
+                if (saveBtn) saveBtn.style.display = 'inline-block';
+                alert('設定をリセットしました🌸');
+            }
+        }
+
+        function unlockGasUrl() {
+            if (confirm('🔒 現在保護されているGASサーバーのURLを変更または解除しますか？')) {
+                const el = document.getElementById('gasUrlInput');
+                const badge = document.getElementById('gasLockBadge');
+                const unlockBtn = document.getElementById('unlockGasBtn');
+                const saveBtn = document.getElementById('saveGasBtn');
+                if (el) {
+                    el.readOnly = false;
+                    el.style.background = '#FFF';
+                    el.style.color = '#444';
+                    el.focus();
+                }
+                if (badge) badge.style.display = 'none';
+                if (unlockBtn) unlockBtn.style.display = 'none';
+                if (saveBtn) saveBtn.style.display = 'inline-block';
+            }
+        }
+
+        function clearTodayHub() {
+            if (confirm('🗑️ 今日のアプリ内表示ログ（キャッシュ）をクリアして初期状態に戻しますか？\n（※Obsidian側のファイルは消去されません✨）')) {
+                localStorage.removeItem('today_start_text');
+                localStorage.removeItem('today_finish_text');
+                localStorage.removeItem('today_start_feedback');
+                localStorage.removeItem('today_finish_feedback');
+                localStorage.removeItem('today_xpost_draft');
+                openTodayHub();
+                alert('🌸 クリア完了！本日の最新状態にリセットしました。');
+            }
+        }
+
+        function refreshTodayHub() {
+            const gasUrl = localStorage.getItem('gas_web_url');
+            if (gasUrl && gasUrl.startsWith('https://script.google.com/')) {
+                const todayStr = new Date().toISOString().slice(0, 10);
+                alert('🔄 GASクラウドから今日の最新日誌を要約・整理して取得します...');
+                fetch(gasUrl + '?action=getTodayJournal')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            if (data.startSummary) localStorage.setItem('today_start_text', data.startSummary);
+                            if (data.briefing) localStorage.setItem('today_start_feedback', data.briefing);
+                            if (data.finishSummary && data.finishSummary !== '夜の完了ログを待機中です🦁🌙') localStorage.setItem('today_finish_text', data.finishSummary);
+                            if (data.finishFeedback && data.finishFeedback !== '今夜ログが送信されるとここにフィードバックが表示されます🌸') localStorage.setItem('today_finish_feedback', data.finishFeedback);
+                            if (data.xPost) localStorage.setItem('today_xpost_draft', data.xPost);
+                            if (data.suggestions && data.suggestions.length) localStorage.setItem('today_proactive_suggestions', JSON.stringify(data.suggestions));
+                            if (data.big3 && data.big3.length) localStorage.setItem('today_big3_tasks', JSON.stringify(data.big3));
+                            alert('🌸 今日の日誌をGoogleドライブから同期し、スマホ画面用に簡潔見やすく整理しました！✨');
+                            openTodayHub();
+                        } else if (data.status === 'notFound') {
+                            alert('🌸 Googleドライブを確認しましたが、まだ本日の日誌ファイルが作成されていません。\n「🌅 朝の開始」から送信するとAIが作成＆同期します✨');
+                            openTodayHub();
+                        } else {
+                            alert('⚠️ 同期結果: ' + (data.error || 'データ取得エラー'));
+                            openTodayHub();
+                        }
+                    })
+                    .catch(err => {
+                        alert('⚠️ ネットワークまたはGAS接続エラー: ' + err.message + '\n(※GAS側が最新コードでデプロイされているかご確認ください🌸)');
+                        openTodayHub();
+                    });
+            } else {
+                openTodayHub();
+                alert('🌸 最新の画面状態に更新しました！（※GASのURLが登録・接続されているとクラウドから自動フェッチされます）');
             }
         }
 
@@ -938,58 +1056,153 @@
             checkDailyReset();
             const startText = localStorage.getItem('today_start_text');
             const finishText = localStorage.getItem('today_finish_text');
+            const startFeedback = localStorage.getItem('today_start_feedback');
+            const finishFeedback = localStorage.getItem('today_finish_feedback');
+            
+            const gasInput = document.getElementById('gasUrlInput');
+            const badge = document.getElementById('gasLockBadge');
+            const unlockBtn = document.getElementById('unlockGasBtn');
+            const saveBtn = document.getElementById('saveGasBtn');
+            const savedGasUrl = localStorage.getItem('gas_web_url');
+            if (gasInput) {
+                gasInput.value = savedGasUrl || '';
+                if (savedGasUrl) {
+                    gasInput.readOnly = true;
+                    gasInput.style.background = '#EBFBEE';
+                    gasInput.style.color = '#2B8A3E';
+                    if (badge) badge.style.display = 'inline-block';
+                    if (unlockBtn) unlockBtn.style.display = 'inline-block';
+                    if (saveBtn) saveBtn.style.display = 'none';
+                } else {
+                    gasInput.readOnly = false;
+                    gasInput.style.background = '#FFF';
+                    gasInput.style.color = '#444';
+                    if (badge) badge.style.display = 'none';
+                    if (unlockBtn) unlockBtn.style.display = 'none';
+                    if (saveBtn) saveBtn.style.display = 'inline-block';
+                }
+            }
 
             const d = new Date();
             const days = ['日', '月', '火', '水', '木', '金', '土'];
             const dateStr = `${d.getFullYear()}年${String(d.getMonth()+1).padStart(2,'0')}月${String(d.getDate()).padStart(2,'0')}日（${days[d.getDay()]}）`;
             document.getElementById('todayHubDateDisplay').innerHTML = `<span style="background:linear-gradient(135deg, #FF5E7E, #FF8C9E); color:#FFF; padding:6px 18px; border-radius:24px; font-weight:800; font-size:0.88rem; box-shadow:0 3px 12px rgba(255,94,126,0.3); display:inline-block;">📅 ${dateStr} のフィードバック＆ログ</span>`;
 
-            // 1. 朝の開始宣言＆ブリーフィング（UIカード化）
-            const startDisplay = startText || 'おはようございます！今日はパパ日勤でワンオペですが、午前中にココナラ対応やゲーム出品、午後は子ども図書館と実家へ行きます🌸';
+            let suggestionsList = [
+                "📱 【午前スキマ】モアクト＆fantaskでサクッとポチポチ作業",
+                "📱 【午後スキマ】予定表やプリントがあったらカメラで自動登録✨",
+                "🎧 【移動・休憩】お茶を飲みながらご自身のペースでリラックス☕"
+            ];
+            try {
+                const savedSugs = localStorage.getItem('today_proactive_suggestions');
+                if (savedSugs) suggestionsList = JSON.parse(savedSugs);
+            } catch(e){}
+
+            let big3List = [
+                "GASクラウド連携チェック＆自動同期完了",
+                "Obsidian Vaultとのリアルタイム接続準備OK✨"
+            ];
+            try {
+                const savedBig3 = localStorage.getItem('today_big3_tasks');
+                if (savedBig3) big3List = JSON.parse(savedBig3);
+            } catch(e){}
+
+            const suggestionsHtml = suggestionsList.map(s => {
+                let clean = s.replace(/^[-*・\s[\]x/]+(?:\*\*\[Proposal\]\*\*\s*|\*\*\[Reminder\]\*\*\s*)?/, '').replace(/\*\*(.*?)\*\*/g, '<b style="color:#D6336C;">$1</b>').trim();
+                return `<div style="margin-bottom:8px; padding:8px 10px; background:#FAFAFC; border:1px solid #FFE3E8; border-radius:10px; font-size:0.83rem; font-weight:700; color:#4A3238; line-height:1.5;">💡 ${clean}</div>`;
+            }).join('');
+            const big3Html = big3List.map((t, idx) => {
+                let clean = t.replace(/^[0-9１２３1-3][.・\s]+|[-*・\s[\]x/]+/g, '').replace(/\*\*(.*?)\*\*/g, '<b style="color:#D6336C;">$1</b>').trim();
+                return `<div style="margin-bottom:8px; padding:8px 10px; background:#FAFAFC; border:1px solid #FFD6E0; border-radius:10px; display:flex; align-items:flex-start; gap:8px;"><span style="display:inline-block; background:#FF4D6D; color:#FFF; padding:2px 8px; border-radius:6px; font-size:0.72rem; font-weight:900; flex-shrink:0; margin-top:2px;">No.${idx+1}</span><span style="font-size:0.83rem; font-weight:700; color:#2D1E22; line-height:1.5;">${clean}</span></div>`;
+            }).join('');
+
+            // テキストの文字の羅列（見にくさ）を解消する見やすいUIカード整形ヘルパー
+            function formatCardUI(text, type) {
+                if (!text) return '';
+                let t = text.replace(/\\n/g, '\n').trim();
+                
+                // ブレークまたは番号付き項目（* ①...、- ①...、* ②...、1. ...、- [ ] ...等）があれば綺麗にパディングされた個別ボックスに分離
+                if (t.match(/(?:^|\n|\s)[*・-]?\s*(?:[①②③④⑤１２３４５1-5][.・)]|[-*]\s|\*\*[①②③④⑤1-5])/)) {
+                    const items = t.split(/(?=(?:^|\n)\s*[*・-]?\s*(?:[①②③④⑤１２３４５1-5][.・)]|\*\*[①②③④⑤1-5]|[-*]\s*\*\*))/g);
+                    if (items.length > 1) {
+                        return items.map((item, idx) => {
+                            let clean = item.trim().replace(/^[*・-]\s*/, '');
+                            if (!clean) return '';
+                            let badgeText = '';
+                            let badgeColor = '#FF4D6D';
+                            let badgeBg = '#FFF0F3';
+                            if (clean.match(/^[①１1]/) || clean.includes('最優先') || clean.includes('一番重要')) { badgeText = '① 最優先事項'; badgeColor = '#FFF'; badgeBg = '#FF4D6D'; }
+                            else if (clean.match(/^[②２2]/) || clean.includes('後回し') || clean.includes('延期')) { badgeText = '② 後回し・保留'; badgeColor = '#D97706'; badgeBg = '#FFF3BF'; }
+                            else if (clean.match(/^[③３3]/) || clean.includes('撤退') || clean.includes('やらなくてよい')) { badgeText = '③ 今はやらない'; badgeColor = '#FFF'; badgeBg = '#868E96'; }
+                            else { badgeText = `ポイント ${idx+1}`; badgeBg = '#F8F9FA'; badgeColor = '#495057'; }
+
+                            clean = clean.replace(/^[①②③④⑤１２３４５1-5][.・)]\s*(\*\*[^*]+\*\*:?)?/, '').replace(/^\*\*[①②③④⑤１２３４５1-5][^*]+\*\*:?\s*/, '').trim();
+                            
+                            return `
+                                <div style="background:#FAFAFC; border:1px solid #EAEAED; border-radius:12px; padding:10px 12px; margin-bottom:8px; line-height:1.55; box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+                                    <div style="margin-bottom:4px;"><span style="background:${badgeBg}; color:${badgeColor}; font-weight:800; font-size:0.72rem; padding:3px 8px; border-radius:6px; display:inline-block;">${badgeText}</span></div>
+                                    <div style="font-size:0.84rem; color:#2D1E22; font-weight:700;">${clean.replace(/\*\*(.*?)\*\*/g, '<b style="color:#D6336C;">$1</b>')}</div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+
+                // 通常文章の場合は段落間隔と強調表示を見やすく整形
+                let paragraphs = t.split(/\n\s*\n|\n/);
+                return paragraphs.filter(p => p.trim()).map(p => {
+                    let formatted = p.trim()
+                        .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#D6336C; background:#FFF0F3; padding:1px 5px; border-radius:4px;">$1</strong>')
+                        .replace(/(`.*?`)/g, '<code style="background:#F1F3F5; color:#E64980; padding:2px 5px; border-radius:4px; font-size:0.8em;">$1</code>');
+                    return `<p style="margin:0 0 10px 0; font-size:0.85rem; line-height:1.65; color:#2D1E22; font-weight:700;">${formatted}</p>`;
+                }).join('');
+            }
+
+            // 1. 朝の開始宣言＆ブリーフィング（簡潔見やすいUIカード化）
+            const startDisplay = formatCardUI(startText || 'まだ本日の開始ログは未記録です。「🌅 朝の開始」ボタンからワンタップでスタートしましょう🌸', 'start');
+            const briefingText = formatCardUI(startFeedback || 'おはようございます、しおりさん！🌸 今日も一日自分のペースで心地よく進んでいきましょう🦁🌱 必要な時はいつでもスキマ提案や音声メモを活かしてくださいね✨', 'briefing');
             const startHtml = `
-                <div style="background:#FFF; padding:10px 12px; border-radius:12px; border-left:4px solid #FF4D6D; margin-bottom:10px; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
-                    <div style="font-size:0.72rem; color:#FF4D6D; font-weight:800; margin-bottom:4px;">🗣️ しおりさんの宣言ログ</div>
-                    <div style="font-size:0.84rem; color:#2D1E22; font-weight:700; line-height:1.4;">${startDisplay}</div>
+                <div style="background:#FFF; padding:12px 14px; border-radius:14px; border-left:5px solid #FF4D6D; margin-bottom:10px; box-shadow:0 2px 6px rgba(255,77,109,0.06);">
+                    <div style="font-size:0.75rem; color:#FF4D6D; font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:4px;">🗣️ しおりさんの朝の宣言・戦略まとめ <span style="background:#FFE3E8; color:#D6336C; padding:1px 6px; border-radius:6px; font-size:0.65rem;">整理版</span></div>
+                    <div>${startDisplay}</div>
                 </div>
-                <div style="background:#FFF9FA; padding:10px 12px; border-radius:12px; border:1px solid #FFD6E0; margin-bottom:10px;">
-                    <div style="font-size:0.75rem; color:#D6336C; font-weight:800; margin-bottom:4px; display:flex; align-items:center; gap:4px;">☕ 秘書のブリーフィング <span style="background:#FF4D6D; color:#FFF; padding:1px 6px; border-radius:8px; font-size:0.65rem;">Antigravity</span></div>
-                    <div style="font-size:0.82rem; color:#6D4C53; font-weight:700; line-height:1.4;">おはようございます、しおりさん！🌸 ワンオペ育児お疲れ様です！動ける午前中のうちに必須タスクやポイ活を活かされていますね👏✨ 午後は図書館で絵本を楽しみ、実家での合間にスマホスキマ作業を回すのが最適解です📱🌱</div>
+                <div style="background:#FFF9FA; padding:12px 14px; border-radius:14px; border:1px solid #FFD6E0; margin-bottom:10px; box-shadow:0 2px 6px rgba(255,77,109,0.04);">
+                    <div style="font-size:0.75rem; color:#D6336C; font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:4px;">☕ 秘書ライオンくんのブリーフィング <span style="background:#FF4D6D; color:#FFF; padding:1px 6px; border-radius:8px; font-size:0.65rem;">要約版</span></div>
+                    <div>${briefingText}</div>
                 </div>
-                <div style="background:#FFF; padding:10px 12px; border-radius:12px; border:1px solid #FFE3E8; margin-bottom:10px;">
-                    <div style="font-size:0.75rem; color:#FF4D6D; font-weight:800; margin-bottom:6px;">💡 今日の提案 (Proactive Suggestions)</div>
-                    <div style="font-size:0.8rem; color:#4A3238; font-weight:700; line-height:1.5;">
-                        <div style="margin-bottom:4px;">📱 【午前スキマ】ココナラ再増加の経過チェック＆安心フォロー</div>
-                        <div style="margin-bottom:4px;">📱 【夕方〜夜スキマ】実家での合間ポチポチ作業</div>
-                        <div>🎧 【移動スキマ】Audible・Voicyでの耳学習</div>
+                <div style="background:#FFF; padding:12px 14px; border-radius:14px; border:1px solid #FFE3E8; margin-bottom:10px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+                    <div style="font-size:0.75rem; color:#FF4D6D; font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:4px;">💡 今日の提案 (Proactive Suggestions)</div>
+                    <div style="font-size:0.83rem; color:#4A3238; font-weight:700; line-height:1.6;">
+                        ${suggestionsHtml}
                     </div>
                 </div>
-                <div style="background:#FFF; padding:10px 12px; border-radius:12px; border:1px solid #FFD6E0;">
-                    <div style="font-size:0.75rem; color:#E64980; font-weight:800; margin-bottom:6px;">🦁 エージェントの提案 (Big 3) ＆ タスク</div>
-                    <div style="font-size:0.8rem; color:#4A3238; font-weight:700; line-height:1.5; margin-bottom:8px;">
-                        <span style="display:inline-block; background:#FFE3E8; color:#D6336C; padding:1px 6px; border-radius:6px; font-size:0.7rem; margin-right:4px;">1</span>ココナラ依頼チェック＆フォロー連絡<br>
-                        <span style="display:inline-block; background:#FFE3E8; color:#D6336C; padding:1px 6px; border-radius:6px; font-size:0.7rem; margin-right:4px;">2</span>子ども図書館＆実家移動！絵本と団らんを楽しむ📖<br>
-                        <span style="display:inline-block; background:#FFE3E8; color:#D6336C; padding:1px 6px; border-radius:6px; font-size:0.7rem; margin-right:4px;">3</span>実家での合間のスマホ完結ポチポチ作業📱
+                <div style="background:#FFF; padding:12px 14px; border-radius:14px; border:1px solid #FFD6E0; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+                    <div style="font-size:0.75rem; color:#E64980; font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:4px;">🦁 今日の最重要タスク (Big 3)</div>
+                    <div style="font-size:0.83rem; color:#4A3238; font-weight:700; line-height:1.6; margin-bottom:10px;">
+                        ${big3Html}
                     </div>
-                    <div style="font-size:0.75rem; color:#2B8A3E; background:#F4FCE3; padding:6px 8px; border-radius:8px; font-weight:700;">
-                        ✅ <b>Today's Tasks</b>: [x] ポイ活朝ログイン / [x] ココナラ対応 / [x] 趣味ゲーム＆出品 / [ ] 図書館 / [ ] 実家団らん
+                    <div style="font-size:0.75rem; color:#2B8A3E; background:#F4FCE3; padding:6px 10px; border-radius:8px; font-weight:700;">
+                        ✅ <b>今日の同期状態</b>: [x] クラウドAI要約・分離完了 / [x] スマホ見やすさ最適化✨
                     </div>
                 </div>
             `;
             document.getElementById('hubStartContent').innerHTML = startHtml;
 
-            // 2. 夜の完了宣言＆Note思考・行動ログ（統合・実際のブログ風ログ反映）
-            const finishDisplay = finishText || '午前中は家事とAI開発でカレンダー連携が完成！午後は子ども図書館とマック、実家でスマホポイ活をして30p→1000p達成しました✨';
-            
-            const noteLogRealText = `### ■ 7/5（日）カレンダー連携完成と、実家でのスマホ完結スキマポチポチ🌸\n\n今日は「もっと次のプロジェクトまで進みたい！」って気持ちもあったけれど、午前中の合間にAIパートナーと集中して、ずっとやりたかった「保育園の予定表PDFからGoogleカレンダーへ自動登録する仕組み」がほぼ一発で完成しましたー！😭✨\nあれもこれもって欲張るより、一番生活が楽になるツールをまず一つ完了できたので、それだけで大満足です😊\n\n午後は子どもたちと図書館に行って、新しい絵本をたくさん借りたり、実家で両親と一緒に韓国ドラマを見てゆっくり過ごしました🌿\nPCを開く時間は全然取れなかったけれど、実家での合間やテレビを見ながらのスキマ時間を使って、スマホからモアクトや fantask をポチポチ📱\n気づけばポイントが30pから1000pまで貯まっていて、スマホだけで回せる仕組みのありがたさを改めて実感しました🥺\n\n休日は育児や家族の時間でバタバタするし、思い通りに進まなくて焦ることもあるけれど、完璧を求めずに「今できる5分10分のポチポチ」を大切にしながら、明日からも自分のペースでゆるゆる続けていきます🦁🧡`;
-            const noteLogDisplay = finishText ? `### ■ 今日の実践ログと振り返り🌸\n\n${finishText}\n\nあれもこれもと欲張らず、スキマ時間にスマホ片手でコツコツ継続できた素晴らしい一日でした📱🌱 完璧を求めずに「今できる5分10分の小さな継続」を大切にしながら、明日も自分のペースでゆるゆる進んでいきましょう🦁🧡` : noteLogRealText;
+            // 2. 夜の完了宣言＆Note思考・行動ログ（簡潔分離版）
+            const finishDisplay = formatCardUI(finishText || 'まだ本日の夜の完了ログは未記録です。夜になったら思考と感情のログを送りましょう🦁🌙', 'finish');
+            const noteLogDisplay = formatCardUI(finishFeedback || 'まだ本日の夜のフィードバックは未記録です。「🌙 夜の完了」ボタンから今日のログを送ると、ここに温かく簡潔にまとめた労いメッセージが表示されます🦁🌸', 'note');
 
             const finishHtml = `
-                <div style="background:#FFF; padding:10px 12px; border-radius:12px; border-left:4px solid #495057; margin-bottom:10px; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
-                    <div style="font-size:0.72rem; color:#495057; font-weight:800; margin-bottom:4px;">🗣️ しおりさんの振り返りログ</div>
-                    <div style="font-size:0.84rem; color:#2D1E22; font-weight:700; line-height:1.4;">${finishDisplay}</div>
+                <div style="background:#FFF; padding:12px 14px; border-radius:14px; border-left:5px solid #495057; margin-bottom:10px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+                    <div style="font-size:0.75rem; color:#495057; font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:4px;">🗣️ しおりさんの夜の振り返りまとめ <span style="background:#E9ECEF; color:#495057; padding:1px 6px; border-radius:6px; font-size:0.65rem;">簡潔版</span></div>
+                    <div>${finishDisplay}</div>
                 </div>
-                <div style="font-size:0.78rem; color:#343A40; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:4px;">💎 抽出された情報 (Extracted Assets)</div>
-                <div style="display:grid; grid-template-columns:1fr; gap:6px; margin-bottom:12px;">
+                <div style="background:#F0FDF4; padding:12px 14px; border-radius:14px; border:1px solid #8CE99A; box-shadow:0 2px 6px rgba(0,0,0,0.02); margin-bottom:10px;">
+                    <div style="font-size:0.75rem; color:#166534; font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:4px;">🌙 秘書ライオンくんの夜の労いフィードバック <span style="background:#22C55E; color:#FFF; padding:1px 6px; border-radius:8px; font-size:0.65rem;">要約版</span></div>
+                    <div>${noteLogDisplay}</div>
+                </div>
+                <div style="font-size:0.78rem; color:#343A40; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:4px;">💎 日常から抽出された資産キーワード</div>
+                <div style="display:grid; grid-template-columns:1fr; gap:6px;">
                     <div style="background:#FFF; padding:8px 10px; border-radius:10px; border:1px solid #E9ECEF; font-size:0.78rem; color:#495057; font-weight:700;">
                         <span style="color:#F76707; font-weight:800;">💡 アイデアの種：</span> スマホ完結ハブの日常化 / 「進めなかった日」を資産構築日へ変換する発信
                     </div>
@@ -997,19 +1210,8 @@
                         <span style="color:#7048E8; font-weight:800;">🧠 思考・価値観：</span> 「削って整える」マインドの実証 / 家族間での気配り・思いやりの言語化
                     </div>
                     <div style="background:#FFF; padding:8px 10px; border-radius:10px; border:1px solid #E9ECEF; font-size:0.78rem; color:#495057; font-weight:700;">
-                        <span style="color:#1098AD; font-weight:800;">🛠️ 知識・ノウハウ：</span> AIとのアジャイルペアプロ極意 / スマホスキマ時間のポイント倍増ノウハウ
+                        <span style="color:#2B8A3E; font-weight:800;">📜 実績・成果：</span> 予定表カレンダー連携アプリ完成！ / スマホスキマ時間のポイント構築🌸
                     </div>
-                    <div style="background:#FFF; padding:8px 10px; border-radius:10px; border:1px solid #E9ECEF; font-size:0.78rem; color:#495057; font-weight:700;">
-                        <span style="color:#2B8A3E; font-weight:800;">📜 実績・成果：</span> 予定表カレンダー連携アプリ完成！ / ポイ活1000p達成 / 図書館＆実家団らん完遂🌸
-                    </div>
-                </div>
-                <div style="background:#F0FDF4; padding:12px; border-radius:14px; border:1px solid #8CE99A; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <span style="background:#DCFCE7; color:#166534; padding:2px 8px; border-radius:8px; font-size:0.75rem; font-weight:800;">📝 Note思考と行動ログ (03_Note)</span>
-                        <span style="font-size:0.7rem; color:#15803D; font-weight:700;">※ 上部のボタンでコピー可能</span>
-                    </div>
-                    <div id="noteLogTextContent" style="font-size:0.84rem; color:#2D1E22; font-weight:700; line-height:1.6; white-space:pre-wrap;">${noteLogDisplay}</div>
-                </div>
             `;
             document.getElementById('hubFinishContent').innerHTML = finishHtml;
 
@@ -1129,6 +1331,45 @@
             };
         }
 
+        function onCategoryChange() {
+            const cat = document.getElementById('categorySelect') ? document.getElementById('categorySelect').value : '';
+            const remSec = document.getElementById('reminderSection');
+            const remLabel = document.getElementById('reminderLabel');
+            const remSubDesc = document.getElementById('reminderSubDesc');
+            const noteLabel = document.getElementById('noteContentLabel');
+            const noteEl = document.getElementById('noteContent');
+            const banner = document.getElementById('smartGuideBanner');
+            const tagGroup = document.getElementById('tagGroup');
+
+            if (!remSec || !noteLabel || !noteEl || !banner) return;
+
+            if (cat.includes('カレンダー')) {
+                remSec.style.display = 'block';
+                if (remLabel) remLabel.innerText = '📅 指定する日（カレンダー予定の対象日・時刻）を選んでね🌸';
+                if (remSubDesc) remSubDesc.innerText = '💡 日付と時刻をタップでピッカー起動！Googleカレンダー＆既存予定とスマートマージ✨';
+                noteLabel.innerText = '✏️ 持ち物・場所など必要な情報のみ（※カテゴリ・インプット不要 / 既存予定時は自動追記）';
+                noteEl.placeholder = '「さいたま市民会館」「水筒、上履き、お箸セット」など、持ち物や場所等の必要な情報だけを入力・話してね🌸';
+                banner.style.display = 'block';
+                banner.innerHTML = '💡 <b>Googleカレンダー連携モード</b>：メモ欄にはインプットや余計なカテゴリは不要！持ち物や場所など必要な情報のみを入力してください。指定日に既存の予定がある場合は自動で追記（スマートマージ）されます✨';
+                if (tagGroup) tagGroup.style.display = 'block';
+            } else if (cat.includes('リマインダー')) {
+                remSec.style.display = 'block';
+                if (remLabel) remLabel.innerText = '⏰ 指定する日（ToDoの期日・通知日時）を選んでね☑️';
+                if (remSubDesc) remSubDesc.innerText = '💡 日付と時刻をタップでピッカー起動！Google ToDo (Tasks) と連携登録✨';
+                noteLabel.innerText = '✏️ タスク内容・補足詳細（Google ToDo / Tasks連携）';
+                noteEl.placeholder = 'やるべきタスクや買い出しメモ、締め切りなどを入力・話してね☑️';
+                banner.style.display = 'block';
+                banner.innerHTML = '💡 <b>Google ToDo (Tasks) 連携モード</b>：指定した日付とタスク内容を Google ToDo / Tasks と連携し、忘れずリマインドします☑️✨';
+                if (tagGroup) tagGroup.style.display = 'block';
+            } else {
+                remSec.style.display = 'none';
+                noteLabel.innerText = '✏️ 内容・詳細（アイデア・思考メモ）';
+                noteEl.placeholder = '行事名やアイデア、思考メモ、つぶやきなどを入力・話してください♪';
+                banner.style.display = 'none';
+                if (tagGroup) tagGroup.style.display = 'block';
+            }
+        }
+
         let currentModalType = 'memo';
 
         function openModal(type) {
@@ -1148,13 +1389,13 @@
             const descEl = document.getElementById('modalDesc');
             const catGroup = document.getElementById('categoryGroup');
             const tagGroup = document.getElementById('tagGroup');
+            const catSelect = document.getElementById('categorySelect');
 
             const submitBtnEl = document.getElementById('modalSubmitBtn');
-            // 朝の開始・夜の完了宣言の時は、カテゴリ仕分けとカレンダー連携マーク（家族タグ）を非表示化！
             if (type === 'start' || type === 'finish') {
                 if (catGroup) catGroup.style.display = 'none';
                 if (tagGroup) tagGroup.style.display = 'none';
-                if (submitBtnEl) submitBtnEl.innerText = '🚀 宣言を送信・記録する 🌸✨';
+                if (submitBtnEl) submitBtnEl.innerText = type === 'start' ? '🚀 /today-start 朝の開始を送信する 🌸✨' : '🚀 /today-finish 夜の完了を送信する 🦁✨';
             } else {
                 if (catGroup) catGroup.style.display = 'block';
                 if (tagGroup) tagGroup.style.display = 'block';
@@ -1163,29 +1404,31 @@
 
             if (type === 'memo') {
                 document.getElementById('modalTitle').innerHTML = '🎤💬 音声＆テキストメモ';
-                descEl.innerHTML = "💡 声で喋っても文字で打ってもOK！思いつきやひらめきを1秒でObsidianへ投函します🌸";
+                descEl.innerHTML = "💡 音声の誤字を防ぐ【録音データそのまま保存→Whisper高精細文字起こし】や手入力テキストに対応🌸";
                 document.getElementById('voiceSection').style.display = 'block';
-                noteEl.placeholder = "行事名や持ち物、テキスト詳細を入力・話してください♪";
+                if (catSelect) catSelect.value = "💡 アウトプット（思考・アイデア・記録・タスク）";
+                onCategoryChange();
             } else if (type === 'image') {
                 document.getElementById('modalTitle').innerHTML = '📷 プリント・予定表スキャン';
                 descEl.innerHTML = "💡 スマホカメラ撮影や画像選択！AIが複数行事を自動検知し、対象者と持ち物を仕分けます📷✨";
                 document.getElementById('imageSection').style.display = 'block';
-                noteEl.placeholder = "プリントの補足メモや持ち物などを入力できます♪";
+                if (catSelect) catSelect.value = "🗓️ カレンダー（Googleカレンダー連携・持ち物/場所のみ・重複時は追記）";
+                onCategoryChange();
             } else if (type === 'reminder') {
                 document.getElementById('modalTitle').innerHTML = '⏰ 予定＆リマインダー設定';
-                descEl.innerHTML = "💡 忘れがちな用事やタスクをセット！Galaxy純正カレンダー＆リマインダーへ即座に同期します📱";
-                document.getElementById('reminderSection').style.display = 'block';
-                noteEl.placeholder = "カレンダーに登録する予定の詳細や場所を入力♪";
+                descEl.innerHTML = "💡 カレンダー予定またはリマインダー(ToDo)の日付を指定し、Googleとスマート連携します📱";
+                if (catSelect) catSelect.value = "🗓️ カレンダー（Googleカレンダー連携・持ち物/場所のみ・重複時は追記）";
+                onCategoryChange();
             } else if (type === 'start') {
                 document.getElementById('modalTitle').innerHTML = '🌅 朝の開始宣言 (/today-start)';
-                descEl.innerHTML = "💡 「おはよう！今朝は〜だよ！」を声や文字で添えて朝ルーティン開始！送信すると『本日限定ハブ』に記録されフィードバックが届きます🌸";
+                descEl.innerHTML = "💡 <b>※メッセージ入力ゼロの『ボタン操作のみ』で全自動送信できます🌸</b> もちろん一言添えてもOK！<br><small style='color:#D9385E; font-weight:800;'>送信後、裏側でAI処理が走りObsidianの今日の日誌へ反映されます✨</small>";
                 document.getElementById('voiceSection').style.display = 'block';
-                noteEl.placeholder = "今日の意気込みや体調を声や文字で入れてね🌸";
+                noteEl.placeholder = "（メッセージゼロでそのまま送信OK🌸 つぶやきたい時だけ声や文字を入れてね）";
             } else if (type === 'finish') {
                 document.getElementById('modalTitle').innerHTML = '🌙 夜の完了 (/today-finish)';
-                descEl.innerHTML = "💡 今日の『思考と感情のログ』（何があったか、何を感じたか、明日の計画）を声で一気に吐き出し！送信すると日誌やXポスト案を生成します🦁";
+                descEl.innerHTML = "💡 今日の『思考と感情のログ』（何があったか、何を感じたか、明日の計画）を声で一気に吐き出し！<br><small style='color:#495057; font-weight:800;'>送信すると日誌やXポスト案を自動生成して保存します🦁✨</small>";
                 document.getElementById('voiceSection').style.display = 'block';
-                noteEl.placeholder = "今日あった出来事や感情を声で話してね🦁";
+                noteEl.placeholder = "今日あった出来事や感情、明日の計画を声で話してね🦁（メッセージゼロでも送信可能です）";
             }
         }
 
@@ -1242,7 +1485,7 @@
             const tags = Array.from(document.querySelectorAll('.tag-checkbox:checked')).map(cb => cb.value);
             const isImageScan = document.getElementById('imageSection').style.display !== 'none';
 
-            if (!content && !isImageScan) {
+            if (!content && !isImageScan && currentModalType !== 'start' && currentModalType !== 'finish') {
                 alert('メモ内容を入力するか、声で話してください♪');
                 return;
             }
@@ -1256,13 +1499,48 @@
 
             checkDailyReset();
             if (currentModalType === 'start' || currentModalType === 'finish') {
+                const commandStr = currentModalType === 'start' ? '/today-start' : '/today-finish';
                 if (currentModalType === 'start') {
-                    localStorage.setItem('today_start_text', content);
+                    localStorage.setItem('today_start_text', content || '（ワンタップコマンド送信・スタート！）');
                 } else {
-                    localStorage.setItem('today_finish_text', content);
+                    localStorage.setItem('today_finish_text', content || '（ワンタップコマンド送信・フィニッシュ！）');
                 }
                 closeModal();
-                alert(currentModalType === 'start' ? '🌅 朝の開始宣言をアプリ内に記録しました！「今日のフィードバック」ハブで確認できます🌸\n（※Obsidianへの保存はAntigravity連動にて行われています✨）' : '🌙 夜の完了宣言をアプリ内に記録しました！「今日のフィードバック」ハブで確認できます🦁\n（※Obsidianへの保存はAntigravity連動にて行われています✨）');
+
+                // GASの無料クラウドサーバー（Google Apps Script）へ自動送信
+                const gasUrl = localStorage.getItem('gas_web_url');
+                if (gasUrl && gasUrl.startsWith('https://script.google.com/')) {
+                    const statusEl = document.getElementById('recordStatus');
+                    alert(`🚀 ${commandStr} コマンドを無料GASクラウドへ送信しました！\n裏側でAI処理が走り、Obsidianの今日の日誌に自動反映されます🌸✨`);
+                    fetch(gasUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify({
+                            command: commandStr,
+                            message: content,
+                            category: currentModalType
+                        })
+                    }).then(res => res.json()).then(data => {
+                        if (data && data.briefing) {
+                            if (currentModalType === 'start') {
+                                localStorage.setItem('today_start_feedback', data.briefing);
+                            } else {
+                                localStorage.setItem('today_finish_feedback', data.briefing);
+                                if (data.xPost) localStorage.setItem('today_xpost_draft', data.xPost);
+                            }
+                            if (data.suggestions && data.suggestions.length) {
+                                localStorage.setItem('today_proactive_suggestions', JSON.stringify(data.suggestions));
+                            }
+                            if (data.big3 && data.big3.length) {
+                                localStorage.setItem('today_big3_tasks', JSON.stringify(data.big3));
+                            }
+                        }
+                    }).catch(err => console.log('GAS sync:', err));
+                } else {
+                    alert(currentModalType === 'start' 
+                        ? '🌅 朝の開始宣言を記録しました！ワンタップでスタート🌸\n（※完全自動・PCなしでObsidianへ書き込む無料GAS設定は、「今日のフィードバック」画面からいつでもURLを登録できます✨）' 
+                        : '🌙 夜の完了宣言（思考と感情のログ）を記録しました！お疲れ様でした🦁\n（※完全自動・PCなしでObsidianへ書き込む無料GAS設定は、「今日のフィードバック」画面からいつでもURLを登録できます✨）');
+                }
                 return;
             }
 
