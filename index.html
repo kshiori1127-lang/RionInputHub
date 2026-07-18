@@ -1546,6 +1546,17 @@
 
             // 通常メモもGASが設定されていればクラウド（Inbox）へ送信（Phase 1連携）
             const gasUrlCloud = localStorage.getItem('gas_web_url');
+
+            // 🌟 Phase 3追加: カレンダーやリマインダー（スケジュール/タスク）の場合は、
+            // 自動登録ロジック（/auto-register）を持つ executeCopyAndRegister へルーティングする！
+            const isSchedule = category.includes('予定') || category.includes('行事') || category.includes('カレンダー');
+            const isTaskReminder = !isSchedule && (category.includes('タスク') || category.includes('お買い物') || category.includes('リマインダー') || reminderTime !== '');
+
+            if (isSchedule || isTaskReminder) {
+                executeCopyAndRegister(category, tags.join(' / ') || '指定なし', reminderTime, content, false);
+                return;
+            }
+
             if (gasUrlCloud && gasUrlCloud.startsWith('https://script.google.com/')) {
                 const statusEl = document.getElementById('recordStatus');
                 const submitBtnEl = document.getElementById('modalSubmitBtn');
@@ -1718,6 +1729,54 @@
             if (reminderTime) formattedNote += `- **⏰ リマインダー日時**: ${reminderTime.replace('T', ' ')}\n`;
             if (isSmartScan) formattedNote += `- **🤖 処理モード**: AIプリント複数行事スマート解析（長女/息子/二人とも自動判別＆持ち物格納）\n`;
             formattedNote += `- **内容・詳細**: \n${content}\n\n`;
+
+            const isSchedule = isSmartScan || category.includes('予定') || category.includes('行事') || category.includes('カレンダー');
+            const isTaskReminder = !isSchedule && (category.includes('タスク') || category.includes('お買い物') || category.includes('リマインダー') || reminderTime !== '');
+
+            // 🌟 Phase 3: GASクラウド連携が設定されている場合、手動モーダルを出さずに全自動バックグラウンド送信！
+            const gasUrlCloud = localStorage.getItem('gas_web_url');
+            if (gasUrlCloud && gasUrlCloud.startsWith('https://script.google.com/')) {
+                const modalEl = document.getElementById('inputModal');
+                if (modalEl) modalEl.classList.remove('active');
+                
+                // 送信中UI表示
+                const container = document.getElementById('syncActionContent');
+                container.innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <div style="font-size:2rem; animation: floatChar 2s infinite;">🚀</div>
+                        <h3 style="color:#D9385E; margin-top:10px;">AIが自動登録しています...</h3>
+                        <p style="font-size:0.8rem; color:#6D4C53;">Googleカレンダー/ToDoへ連携中</p>
+                    </div>
+                `;
+                document.getElementById('syncActionModal').classList.add('active');
+
+                fetch(gasUrlCloud, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        command: '/auto-register',
+                        message: content,
+                        category: category,
+                        target: target,
+                        reminderTime: reminderTime,
+                        isSmartScan: isSmartScan,
+                        multiEvents: multiEvents
+                    })
+                }).then(res => res.json()).then(data => {
+                    container.innerHTML = `
+                        <div style="background:#EBFBEE; border:1px solid #2B8A3E; color:#2B8A3E; font-size:0.9rem; font-weight:800; padding:12px; border-radius:12px; margin-bottom:12px; text-align:center;">
+                            ✅ AIによる自動登録が完了しました！✨
+                        </div>
+                        <p style="font-size:0.8rem; color:#4A3238; font-weight:700; text-align:center; margin-bottom:14px;">
+                            ${isSchedule ? '📅 Googleカレンダーに予定と持ち物がセットされました🌸' : (isTaskReminder ? '⏰ Google ToDo (Tasks) にタスクと詳細がセットされました🌸' : '📪 Inboxへ格納されました🌸')}
+                        </p>
+                        <button onclick="closeSyncModal()" style="width:100%; padding:12px; background:#F8F9FA; border:2px solid #EAEAED; border-radius:12px; color:#495057; font-weight:800; cursor:pointer;">閉じる</button>
+                    `;
+                }).catch(err => {
+                    container.innerHTML = `<div style="color:red; padding:20px; font-weight:bold;">❌ エラーが発生しました。時間を置いてお試しください。<br><br><button onclick="closeSyncModal()">閉じる</button></div>`;
+                });
+                return; // 自動送信した場合はここで終了（手動モーダルは出さない）
+            }
 
             const showSyncModal = () => {
                 const noteEl = document.getElementById('noteContent');
