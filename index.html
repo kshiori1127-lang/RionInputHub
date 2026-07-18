@@ -506,7 +506,7 @@
                 <!-- 1. 音声＆テキストメモ -->
                 <div class="bubble-btn" onclick="openModal('memo')">
                     <div class="bubble-icon">🎤💬</div>
-                    <div class="bubble-title">音声メモ<span class="bubble-sub">AI速記＆投函</span></div>
+                    <div class="bubble-title">テキスト＆音声<span class="bubble-sub">Antigravityへ送信</span></div>
                 </div>
 
                 <!-- 2. プリント・予定表スキャン -->
@@ -649,7 +649,7 @@
                 <textarea id="noteContent" rows="4" placeholder="行事名や持ち物、テキスト詳細を入力・話してください♪"></textarea>
             </div>
 
-            <button class="submit-btn" id="modalSubmitBtn" onclick="submitNote()">Obsidian＆カレンダーへ魔法送信 🌸✨</button>
+            <button class="submit-btn" id="modalSubmitBtn" onclick="submitNote()">Antigravity（クラウド）へ魔法送信 🌸✨</button>
             <button onclick="closeModal()" style="width:100%; margin-top:12px; padding:14px; background:#FAFAFC; border:2px solid #E5D5D8; border-radius:20px; color:#6D4C53; font-weight:800; cursor:pointer; font-size:0.95rem;">🔙 TOPに戻る（メイン画面）</button>
         </div>
     </div>
@@ -699,7 +699,7 @@
             </div>
             <div class="modal-desc" style="background:#F4F9FF; border-color:#D0E3FF; font-size:0.85rem;">
                 💡 朝夜の宣言から生成された「日誌・Note・ポスト案」の確認＆Obsidian起動ハブ✨<br>
-                <small style="color:#2B8A3E; font-weight:700;">※ 「📱 Obsidianで開く」をタップすると、スマホのObsidianで該当ファイルが開きます。</small>
+                <small style="color:#2B8A3E; font-weight:700;">※ 「📱 スマホ版Obsidianを開く」をタップすると、スマホのObsidianで該当ファイルが開きます。</small>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:18px;">
@@ -707,7 +707,7 @@
                 <div style="background:#FFF0F3; border:2px solid #FFCCD5; border-radius:18px; padding:14px; box-shadow:0 4px 12px rgba(255,77,109,0.08);" id="hubStartArea">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px dashed #FFB3C1; padding-bottom:8px;">
                         <h4 style="color:#FF4D6D; font-size:0.92rem; font-weight:800; display:flex; align-items:center; gap:6px;">🌅 朝の開始宣言＆ブリーフィング</h4>
-                        <button onclick="syncObsidianHub('start')" style="background:#FF4D6D; color:#FFF; border:none; padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(255,77,109,0.3);">📱 Obsidianで開く</button>
+                        <button onclick="syncObsidianHub('start')" style="background:#FF4D6D; color:#FFF; border:none; padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(255,77,109,0.3);">📱 スマホ版Obsidianを開く</button>
                     </div>
                     <div id="hubStartContent"></div>
                 </div>
@@ -718,7 +718,7 @@
                         <h4 style="color:#495057; font-size:0.92rem; font-weight:800; display:flex; align-items:center; gap:6px;">🌙 夜の完了宣言＆Note思考・行動ログ</h4>
                         <div style="display:flex; gap:6px;">
                             <button onclick="copyNoteLog()" style="background:#2B8A3E; color:#FFF; border:none; padding:5px 10px; border-radius:10px; font-size:0.75rem; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(43,138,62,0.3);">📋 Noteログコピー</button>
-                            <button onclick="syncObsidianHub('finish')" style="background:#495057; color:#FFF; border:none; padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(73,80,87,0.3);">📱 Obsidianで開く</button>
+                            <button onclick="syncObsidianHub('finish')" style="background:#495057; color:#FFF; border:none; padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(73,80,87,0.3);">📱 スマホ版Obsidianを開く</button>
                         </div>
                     </div>
                     <div id="hubFinishContent"></div>
@@ -728,7 +728,7 @@
                 <div style="background:#FFFCE8; border:2px solid #FFE066; border-radius:18px; padding:14px; box-shadow:0 4px 12px rgba(245,159,0,0.08);" id="hubPostArea">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px dashed #FFD43B; padding-bottom:8px;">
                         <h4 style="color:#D97706; font-size:0.92rem; font-weight:800; display:flex; align-items:center; gap:6px;">🐦 本日のXポスト案 (個別コピー可能)</h4>
-                        <button onclick="syncObsidianHub('post')" style="background:#1A73E8; color:#FFF; border:none; padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(26,115,232,0.3);">📱 Obsidianで開く</button>
+                        <button onclick="syncObsidianHub('post')" style="background:#1A73E8; color:#FFF; border:none; padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(26,115,232,0.3);">📱 スマホ版Obsidianを開く</button>
                     </div>
                     <div id="hubPostContent" style="display:flex; flex-direction:column; gap:10px;"></div>
                 </div>
@@ -763,7 +763,7 @@
                 💡 プリント内の複数行事を一括検知！キーワードから「長女・息子・二人とも」をAI判別しました🌸 日付や持ち物をタップで調整できます！
             </p>
             <div id="multiEventsContainer" style="max-height: 52vh; overflow-y: auto; margin-bottom: 14px; padding-right: 4px; display:flex; flex-direction:column; gap:12px;"></div>
-            <button class="submit-btn" onclick="finalizePreviewEdit()" style="background: linear-gradient(135deg, #FF4D6D 0%, #FF758C 100%); margin-bottom:10px;">✅ チェックした行事をカレンダー＆Obsidianへ一括確定！</button>
+            <button class="submit-btn" onclick="finalizePreviewEdit()" style="background: linear-gradient(135deg, #FF4D6D 0%, #FF758C 100%); margin-bottom:10px;">✅ チェックした行事をカレンダー＆Antigravityへ一括確定！</button>
             <button onclick="closePreviewEdit()" style="width:100%; padding:12px; background:#FAFAFC; border:2px solid #E5D5D8; border-radius:20px; color:#6D4C53; font-weight:800; cursor:pointer; font-size:0.9rem;">🔙 修正をやめて前の画面に戻る</button>
         </div>
     </div>
@@ -1399,7 +1399,7 @@
             } else {
                 if (catGroup) catGroup.style.display = 'block';
                 if (tagGroup) tagGroup.style.display = 'block';
-                if (submitBtnEl) submitBtnEl.innerText = 'Obsidian＆カレンダーへ魔法送信 🌸✨';
+                if (submitBtnEl) submitBtnEl.innerText = 'Antigravity（クラウド）へ魔法送信 🌸✨';
             }
 
             if (type === 'memo') {
@@ -1421,7 +1421,7 @@
                 onCategoryChange();
             } else if (type === 'start') {
                 document.getElementById('modalTitle').innerHTML = '🌅 朝の開始宣言 (/today-start)';
-                descEl.innerHTML = "💡 <b>※メッセージ入力ゼロの『ボタン操作のみ』で全自動送信できます🌸</b> もちろん一言添えてもOK！<br><small style='color:#D9385E; font-weight:800;'>送信後、裏側でAI処理が走りObsidianの今日の日誌へ反映されます✨</small>";
+                descEl.innerHTML = "💡 <b>※メッセージ入力ゼロの『ボタン操作のみ』で全自動送信できます🌸</b> もちろん一言添えてもOK！<br><small style='color:#D9385E; font-weight:800;'>PCのAntigravityへ送信され、全自動で日誌へ反映されます✨</small>";
                 document.getElementById('voiceSection').style.display = 'block';
                 noteEl.placeholder = "（メッセージゼロでそのまま送信OK🌸 つぶやきたい時だけ声や文字を入れてね）";
             } else if (type === 'finish') {
@@ -1543,8 +1543,34 @@
                 }
                 return;
             }
+            }
 
-            executeCopyAndRegister(category, tags.join(' / ') || '指定なし', reminderTime, content, false);
+            // 通常メモもGASが設定されていればクラウド（Inbox）へ送信（Phase 1連携）
+            const gasUrlCloud = localStorage.getItem('gas_web_url');
+            if (gasUrlCloud && gasUrlCloud.startsWith('https://script.google.com/')) {
+                closeModal();
+                const statusEl = document.getElementById('recordStatus');
+                statusEl.innerHTML = '🚀 クラウド（Inbox）へ安全に送信中です...';
+                
+                fetch(gasUrlCloud, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        command: '', // 通常メモ
+                        message: content,
+                        category: category + (tags.length ? ` (${tags.join(' / ')})` : '')
+                    })
+                }).then(res => res.json()).then(data => {
+                    statusEl.innerHTML = `✅ ${data.briefing || 'クラウドへ保存完了しました！🌸'}`;
+                    setTimeout(() => { statusEl.innerHTML = '🦁 マイクをタップして声で話すか、下に入力してね！'; }, 4000);
+                }).catch(err => {
+                    console.log('GAS sync:', err);
+                    statusEl.innerHTML = '❌ 送信エラーが発生しました。';
+                });
+            } else {
+                alert('【お知らせ】現在スマホ側に「GAS URL」が登録されていないため、以前と同じスマホ内Obsidianへの直接保存画面を表示します🦁\n※完全自動でクラウドへ送るには、「今日のフィードバック」画面からURLを登録してくださいね🌸');
+                executeCopyAndRegister(category, tags.join(' / ') || '指定なし', reminderTime, content, false);
+            }
         }
 
         function renderMultiEvents(content) {
