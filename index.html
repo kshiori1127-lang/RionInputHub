@@ -1547,9 +1547,15 @@
             // 通常メモもGASが設定されていればクラウド（Inbox）へ送信（Phase 1連携）
             const gasUrlCloud = localStorage.getItem('gas_web_url');
             if (gasUrlCloud && gasUrlCloud.startsWith('https://script.google.com/')) {
-                closeModal();
                 const statusEl = document.getElementById('recordStatus');
+                const submitBtnEl = document.getElementById('modalSubmitBtn');
+                
                 statusEl.innerHTML = '🚀 クラウド（Inbox）へ安全に送信中です...';
+                if (submitBtnEl) {
+                    submitBtnEl.innerText = '🚀 送信中... (少々お待ちください)';
+                    submitBtnEl.disabled = true;
+                    submitBtnEl.style.opacity = '0.7';
+                }
                 
                 fetch(gasUrlCloud, {
                     method: 'POST',
@@ -1560,11 +1566,24 @@
                         category: category + (tags.length ? ` (${tags.join(' / ')})` : '')
                     })
                 }).then(res => res.json()).then(data => {
-                    statusEl.innerHTML = `✅ ${data.briefing || 'クラウドへ保存完了しました！🌸'}`;
-                    setTimeout(() => { statusEl.innerHTML = '🦁 マイクをタップして声で話すか、下に入力してね！'; }, 4000);
+                    if (submitBtnEl) {
+                        submitBtnEl.innerText = 'Antigravity（クラウド）へ魔法送信 🌸✨';
+                        submitBtnEl.disabled = false;
+                        submitBtnEl.style.opacity = '1';
+                    }
+                    statusEl.innerHTML = '🦁 マイクをタップして声で話すか、下に入力してね！';
+                    alert(`✅ ${data.briefing || 'クラウド（Inbox）へ保存完了しました！🌸'}`);
+                    document.getElementById('noteContent').value = '';
+                    closeModal();
                 }).catch(err => {
                     console.log('GAS sync:', err);
+                    if (submitBtnEl) {
+                        submitBtnEl.innerText = 'Antigravity（クラウド）へ魔法送信 🌸✨';
+                        submitBtnEl.disabled = false;
+                        submitBtnEl.style.opacity = '1';
+                    }
                     statusEl.innerHTML = '❌ 送信エラーが発生しました。';
+                    alert('❌ 送信エラーが発生しました。時間を置いて再度お試しください。');
                 });
             } else {
                 alert('【お知らせ】現在スマホ側に「GAS URL」が登録されていないため、以前と同じスマホ内Obsidianへの直接保存画面を表示します🦁\n※完全自動でクラウドへ送るには、「今日のフィードバック」画面からURLを登録してくださいね🌸');
