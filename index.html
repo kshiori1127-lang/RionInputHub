@@ -1470,12 +1470,87 @@
         function triggerPrintScan(force = false) {
             const fileInput = document.getElementById('printFileInput');
             if (force || (fileInput.files && fileInput.files.length > 0)) {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    alert('先にカメラで撮影するか、画像を選択してください！📷');
+                    return;
+                }
+
+                const gasUrlCloud = localStorage.getItem('gas_web_url');
+                if (!gasUrlCloud || !gasUrlCloud.startsWith('https://script.google.com/')) {
+                    alert('完全自動プリント解析を利用するには、GAS URLの登録が必要です🌸（仮のダミーデータを表示します）');
+                    document.getElementById('inputModal').classList.remove('active');
+                    document.getElementById('previewEditModal').classList.add('active');
+                    renderMultiEvents(null); // ダミー
+                    return;
+                }
+
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                // 送信中UI
                 document.getElementById('inputModal').classList.remove('active');
-                document.getElementById('previewEditModal').classList.add('active');
-                renderMultiEvents(document.getElementById('noteContent').value);
+                document.getElementById('syncActionContent').innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <div style="font-size:2rem; animation: floatChar 2s infinite;">📷✨</div>
+                        <h3 style="color:#D9385E; margin-top:10px;">AIがプリントを解析中...</h3>
+                        <p style="font-size:0.8rem; color:#6D4C53;">行事・持ち物を自動仕分けしています（約5〜10秒）</p>
+                    </div>
+                `;
+                document.getElementById('syncActionModal').classList.add('active');
+
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Canvasで省エネ圧縮（長辺最大1000px、品質0.6）
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const max_size = 1000;
+                        if (width > height && width > max_size) {
+                            height *= max_size / width;
+                            width = max_size;
+                        } else if (height > max_size) {
+                            width *= max_size / height;
+                            height = max_size;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const base64String = canvas.toDataURL('image/jpeg', 0.6).split(',')[1]; // プレフィックス除去
+
+                        // GASの /ocr コマンドへ送信
+                        fetch(gasUrlCloud, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain' },
+                            body: JSON.stringify({
+                                command: '/ocr',
+                                image: base64String
+                            })
+                        }).then(res => res.json()).then(data => {
+                            document.getElementById('syncActionModal').classList.remove('active');
+                            if (data.error) {
+                                alert('❌ AI解析エラー: ' + data.error);
+                            } else if (data.events && data.events.length > 0) {
+                                document.getElementById('previewEditModal').classList.add('active');
+                                renderMultiEvents(data.events);
+                            } else {
+                                alert('⚠️ 行事が見つかりませんでした。別の写真を試してください。');
+                            }
+                            fileInput.value = ''; // リセット
+                        }).catch(err => {
+                            document.getElementById('syncActionModal').classList.remove('active');
+                            alert('❌ 通信エラーが発生しました。');
+                            fileInput.value = '';
+                        });
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
             }
         }
 
+        // isImageScanフラグでの手動送信時の挙動を修正
         function submitNote() {
             const content = document.getElementById('noteContent').value;
             const category = document.getElementById('categorySelect').value;
@@ -1489,11 +1564,27 @@
                 alert('メモ内容を入力するか、声で話してください♪');
                 return;
             }
+            
+            // スマホからの裏技コマンド（お掃除）
+            if (content.trim() === '/cleanup' || content.trim() === 'お掃除') {
+                const gasUrlCloud = localStorage.getItem('gas_web_url');
+                if (gasUrlCloud && gasUrlCloud.startsWith('https://script.google.com/')) {
+                    alert('🧹 カレンダーの重複予定を探してお掃除（削除）します...');
+                    fetch(gasUrlCloud, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify({ command: '/cleanup' })
+                    }).then(res => res.json()).then(data => {
+                        alert(data.message || 'お掃除完了しました！');
+                        document.getElementById('noteContent').value = '';
+                    });
+                }
+                return;
+            }
 
             if (isImageScan) {
-                document.getElementById('inputModal').classList.remove('active');
-                document.getElementById('previewEditModal').classList.add('active');
-                renderMultiEvents(content);
+                // 画像スキャン画面で直接「送信」を押した場合は、プレビューは出さず通常メモとして送るか警告する
+                alert('プリント解析を行う場合は、上の「写真・プリントのAI解析を開始」ボタンを押してください📷✨');
                 return;
             }
 
@@ -1602,48 +1693,53 @@
             }
         }
 
-        function renderMultiEvents(content) {
+        function renderMultiEvents(apiEvents) {
             const container = document.getElementById('multiEventsContainer');
             container.innerHTML = '';
 
-            let events = [
-                { date: "2026-07-02", time: "10:00", title: "プラネタリウム見学（年長）", target: "🦄 ゆい (長女・ピンク)", belongings: "水筒、コップ、お箸セット、記名済みしおり", statusText: "🆕 新規追加" },
-                { date: "2026-07-03", time: "10:15", title: "全園児 避難訓練", target: "👶👶 ゆい＆ちひろ (二人とも・赤)", belongings: "防災頭巾チェック、上履き", statusText: "🔄 既存予定へ時間・持ち物を追記編集✨" },
-                { date: "2026-07-08", time: "10:30", title: "ECC英語教室（年長）", target: "🦄 ゆい (長女・ピンク)", belongings: "英語教材ノート、筆記用具", statusText: "🆕 新規追加" },
-                { date: "2026-07-13", time: "14:00", title: "たいよう組 個人面談", target: "🦁 ちひろ (息子・水色)", belongings: "質問・相談シート、室内スリッパ持参", statusText: "🔄 既存面談枠へ持ち物・時間を追記編集✨" }
-            ];
+            let events = apiEvents;
+            if (!events || events.length === 0) {
+                // APIデータがない場合のフォールバック（ダミー）
+                events = [
+                    { date: "2026-07-02", time: "10:00", title: "プラネタリウム見学（ダミー）", target: "🦄 ゆい", belongings: "水筒、コップ", statusText: "🆕 新規追加" }
+                ];
+            }
 
             events.forEach((ev, idx) => {
                 const card = document.createElement('div');
                 card.className = 'event-card';
                 card.style.cssText = "background:#FFF9FA; border:2px solid #FFCCD5; border-radius:16px; padding:12px; box-shadow:0 2px 8px rgba(255,77,109,0.06);";
-                const stText = ev.statusText || "🆕 新規追加";
+                const stText = ev.statusText || "✨ 解析完了";
                 const isUpdate = stText.includes("🔄");
+                
+                // targetの初期選択用ヘルパー
+                const tStr = ev.target || "";
+                
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
                         <label style="display:flex; align-items:center; gap:6px; font-weight:800; color:#D9385E; cursor:pointer; font-size:0.83rem;">
                             <input type="checkbox" class="ev-check" checked style="width:18px; height:18px; accent-color:#FF4D6D;">
-                            <span>📅 <input type="date" class="ev-date" value="${ev.date}" style="border:1px solid #FFCCD5; border-radius:8px; padding:4px 6px; font-weight:700; color:#2D1E22; font-family:inherit; background:#FFF;"></span>
-                            <span>⏰ <input type="time" class="ev-time" value="${ev.time}" style="border:1px solid #FFCCD5; border-radius:8px; padding:4px 6px; font-weight:700; color:#2D1E22; font-family:inherit; background:#FFF;"></span>
+                            <span>📅 <input type="date" class="ev-date" value="${ev.date || ''}" style="border:1px solid #FFCCD5; border-radius:8px; padding:4px 6px; font-weight:700; color:#2D1E22; font-family:inherit; background:#FFF;"></span>
+                            <span>⏰ <input type="time" class="ev-time" value="${ev.time !== '00:00' ? ev.time : ''}" style="border:1px solid #FFCCD5; border-radius:8px; padding:4px 6px; font-weight:700; color:#2D1E22; font-family:inherit; background:#FFF;"></span>
                         </label>
                     </div>
                     <div style="margin-bottom:6px;">
                         <span class="status-badge" style="background:${isUpdate ? '#E3FAEA' : '#FFE5EC'}; color:${isUpdate ? '#2B8A3E' : '#FF4D6D'}; padding:3px 8px; border-radius:10px; font-size:0.72rem; font-weight:800; display:inline-block; margin-bottom:4px;">${stText}</span>
-                        <input type="text" class="ev-title" value="${ev.title}" style="width:100%; border:1px solid #FFCCD5; border-radius:8px; padding:7px; font-weight:700; color:#2D1E22; font-size:0.88rem;">
+                        <input type="text" class="ev-title" value="${ev.title || ''}" style="width:100%; border:1px solid #FFCCD5; border-radius:8px; padding:7px; font-weight:700; color:#2D1E22; font-size:0.88rem;">
                     </div>
                     <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px;">
                         <span style="font-size:0.75rem; font-weight:800; color:#8C6B73; white-space:nowrap;">👤 対象:</span>
                         <select class="ev-target" style="flex:1; border:1px solid #FFCCD5; border-radius:8px; padding:6px; font-weight:700; color:#2D1E22; font-size:0.8rem;">
-                            <option value="🦄 ゆい (長女・ピンク)" ${ev.target.includes('ゆい') || ev.target.includes('長女') ? 'selected' : ''}>🦄 ゆい (長女・ピンク)</option>
-                            <option value="🦁 ちひろ (息子・水色)" ${ev.target.includes('ちひろ') || ev.target.includes('息子') ? 'selected' : ''}>🦁 ちひろ (息子・水色)</option>
-                            <option value="👶👶 ゆい＆ちひろ (二人とも・赤)" ${ev.target.includes('二人とも') || ev.target.includes('子供たち') ? 'selected' : ''}>👶👶 ゆい＆ちひろ (二人とも・赤)</option>
-                            <option value="👩 しおり (ママ・オレンジ)" ${ev.target.includes('しおり') || ev.target.includes('ママ') ? 'selected' : ''}>👩 しおり (ママ・オレンジ)</option>
-                            <option value="🦍 ゆうた (パパ・緑)" ${ev.target.includes('ゆうた') || ev.target.includes('パパ') ? 'selected' : ''}>🦍 ゆうた (パパ・緑)</option>
-                            <option value="🏡 家族全員 (紫)" ${ev.target.includes('家族全員') ? 'selected' : ''}>🏡 家族全員 (紫)</option>
+                            <option value="🦄 ゆい (長女)" ${tStr.includes('ゆい') || tStr.includes('長女') ? 'selected' : ''}>🦄 ゆい (長女)</option>
+                            <option value="🦁 ちひろ (息子)" ${tStr.includes('ちひろ') || tStr.includes('息子') || tStr.includes('長男') ? 'selected' : ''}>🦁 ちひろ (息子)</option>
+                            <option value="👶👶 ゆい＆ちひろ (二人とも)" ${tStr.includes('二人とも') || tStr.includes('全員') ? 'selected' : ''}>👶👶 ゆい＆ちひろ (二人とも)</option>
+                            <option value="👩 しおり (ママ)" ${tStr.includes('しおり') || tStr.includes('ママ') || tStr.includes('母') ? 'selected' : ''}>👩 しおり (ママ)</option>
+                            <option value="🦍 ゆうた (パパ)" ${tStr.includes('ゆうた') || tStr.includes('パパ') || tStr.includes('父') ? 'selected' : ''}>🦍 ゆうた (パパ)</option>
+                            <option value="🏡 家族全員" ${tStr.includes('家族') ? 'selected' : ''}>🏡 家族全員</option>
                         </select>
                     </div>
                     <div>
-                        <input type="text" class="ev-belongings" value="🎒 持ち物/補足: ${ev.belongings}" style="width:100%; border:1px dashed #FFCCD5; background:#FFF; border-radius:8px; padding:7px; font-size:0.78rem; color:#6D4C53; font-weight:700;">
+                        <input type="text" class="ev-belongings" value="${ev.belongings || '特になし'}" style="width:100%; border:1px dashed #FFCCD5; background:#FFF; border-radius:8px; padding:7px; font-size:0.78rem; color:#6D4C53; font-weight:700;">
                     </div>
                 `;
                 container.appendChild(card);
@@ -1722,6 +1818,9 @@
         }
 
         function executeCopyAndRegister(category, target, reminderTime, content, isSmartScan, multiEvents = null) {
+            const noteEl = document.getElementById('noteContent');
+            if (noteEl) noteEl.value = '';
+
             let formattedNote = `### 🌸 インポートメモ (${new Date().toLocaleTimeString('ja-JP', {hour: '2-digit', minute:'2-digit'})})\n` +
                                 `- **カテゴリ**: ${category}\n` +
                                 `- **対象・家族タグ**: ${target}\n`;
@@ -1731,7 +1830,7 @@
             formattedNote += `- **内容・詳細**: \n${content}\n\n`;
 
             const isSchedule = isSmartScan || category.includes('予定') || category.includes('行事') || category.includes('カレンダー');
-            const isTaskReminder = !isSchedule && (category.includes('タスク') || category.includes('お買い物') || category.includes('リマインダー') || reminderTime !== '');
+            const isTaskReminder = !isSchedule && ((category.includes('タスク') && !category.includes('思考')) || category.includes('お買い物') || category.includes('リマインダー') || reminderTime !== '');
 
             // 🌟 Phase 3: GASクラウド連携が設定されている場合、手動モーダルを出さずに全自動バックグラウンド送信！
             const gasUrlCloud = localStorage.getItem('gas_web_url');
@@ -1779,8 +1878,6 @@
             }
 
             const showSyncModal = () => {
-                const noteEl = document.getElementById('noteContent');
-                if (noteEl) noteEl.value = '';
                 const modalEl = document.getElementById('inputModal');
                 if (modalEl) modalEl.classList.remove('active');
 
@@ -1788,7 +1885,7 @@
                 container.innerHTML = '';
 
                 const isSchedule = isSmartScan || category.includes('予定') || category.includes('行事');
-                const isTaskReminder = !isSchedule && (category.includes('タスク') || category.includes('お買い物') || reminderTime !== '');
+                const isTaskReminder = !isSchedule && ((category.includes('タスク') && !category.includes('思考')) || category.includes('お買い物') || reminderTime !== '');
 
                 if (isSchedule) {
                     const todayStr = new Date().toISOString().slice(0, 10);
